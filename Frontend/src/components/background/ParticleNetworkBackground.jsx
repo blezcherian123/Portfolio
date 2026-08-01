@@ -1,0 +1,173 @@
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+
+// Linked particles for the section, plus the same free-floating cyan cloud
+// used by the hero so both areas feel like one continuous environment.
+export default function ParticleNetworkBackground({
+  pointsCount = 80,
+  color = 0x5DE6FF,
+  linkDistance = 3.25,
+  className = '',
+}) {
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return undefined
+
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
+    camera.position.z = 10
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    renderer.domElement.style.display = 'block'
+    container.appendChild(renderer.domElement)
+
+    const getBounds = () => ({
+      x: Math.max(3.8, camera.aspect * 4.5),
+      y: 4.35,
+      z: 3.2,
+    })
+    const resize = () => {
+      const width = container.clientWidth || window.innerWidth
+      const height = container.clientHeight || window.innerHeight
+      camera.aspect = width / height
+      camera.updateProjectionMatrix()
+      renderer.setSize(width, height)
+    }
+    resize()
+
+    const networkGroup = new THREE.Group()
+    scene.add(networkGroup)
+    const bounds = getBounds()
+    const nodePositions = new Float32Array(pointsCount * 3)
+    const velocities = new Float32Array(pointsCount * 3)
+    for (let index = 0; index < pointsCount; index += 1) {
+      nodePositions[index * 3] = (Math.random() * 2 - 1) * bounds.x
+      nodePositions[index * 3 + 1] = (Math.random() * 2 - 1) * bounds.y
+      nodePositions[index * 3 + 2] = (Math.random() * 2 - 1) * bounds.z
+      velocities[index * 3] = (Math.random() * 2 - 1) * 0.24
+      velocities[index * 3 + 1] = (Math.random() * 2 - 1) * 0.24
+      velocities[index * 3 + 2] = (Math.random() * 2 - 1) * 0.12
+    }
+
+    const nodeGeometry = new THREE.BufferGeometry()
+    const nodePositionAttribute = new THREE.BufferAttribute(nodePositions, 3)
+    nodePositionAttribute.setUsage(THREE.DynamicDrawUsage)
+    nodeGeometry.setAttribute('position', nodePositionAttribute)
+    const nodeMaterial = new THREE.PointsMaterial({
+      color,
+      size: 0.1,
+      transparent: true,
+      opacity: 0.62,
+      blending: THREE.AdditiveBlending,
+    })
+    networkGroup.add(new THREE.Points(nodeGeometry, nodeMaterial))
+
+    const linePositions = new Float32Array(pointsCount * (pointsCount - 1) * 3)
+    const lineGeometry = new THREE.BufferGeometry()
+    const linePositionAttribute = new THREE.BufferAttribute(linePositions, 3)
+    linePositionAttribute.setUsage(THREE.DynamicDrawUsage)
+    lineGeometry.setAttribute('position', linePositionAttribute)
+    lineGeometry.setDrawRange(0, 0)
+    const lineMaterial = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.1 })
+    const lines = new THREE.LineSegments(lineGeometry, lineMaterial)
+    networkGroup.add(lines)
+
+    // This is deliberately the same free particle cloud as the hero's background.
+    const ambientCount = 200
+    const ambientPositions = new Float32Array(ambientCount * 3)
+    for (let index = 0; index < ambientCount; index += 1) {
+      ambientPositions[index * 3] = (Math.random() - 0.5) * 15
+      ambientPositions[index * 3 + 1] = (Math.random() - 0.5) * 15
+      ambientPositions[index * 3 + 2] = (Math.random() - 0.5) * 15
+    }
+    const ambientGeometry = new THREE.BufferGeometry()
+    ambientGeometry.setAttribute('position', new THREE.BufferAttribute(ambientPositions, 3))
+    const ambientMaterial = new THREE.PointsMaterial({ color: 0x22D3EE, size: 0.05, transparent: true, opacity: 0.5 })
+    const ambientPoints = new THREE.Points(ambientGeometry, ambientMaterial)
+    scene.add(ambientPoints)
+
+    const refreshConnections = () => {
+      let vertexCount = 0
+      const maxDistanceSquared = linkDistance * linkDistance
+      for (let first = 0; first < pointsCount; first += 1) {
+        for (let second = first + 1; second < pointsCount; second += 1) {
+          const firstOffset = first * 3
+          const secondOffset = second * 3
+          const deltaX = nodePositions[firstOffset] - nodePositions[secondOffset]
+          const deltaY = nodePositions[firstOffset + 1] - nodePositions[secondOffset + 1]
+          const deltaZ = nodePositions[firstOffset + 2] - nodePositions[secondOffset + 2]
+          if (deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ > maxDistanceSquared) continue
+
+          const lineOffset = vertexCount * 3
+          linePositions[lineOffset] = nodePositions[firstOffset]
+          linePositions[lineOffset + 1] = nodePositions[firstOffset + 1]
+          linePositions[lineOffset + 2] = nodePositions[firstOffset + 2]
+          linePositions[lineOffset + 3] = nodePositions[secondOffset]
+          linePositions[lineOffset + 4] = nodePositions[secondOffset + 1]
+          linePositions[lineOffset + 5] = nodePositions[secondOffset + 2]
+          vertexCount += 2
+        }
+      }
+      lineGeometry.setDrawRange(0, vertexCount)
+      linePositionAttribute.needsUpdate = true
+    }
+
+    let mouseX = 0
+    let mouseY = 0
+    const handleMouseMove = (event) => {
+      mouseX = (event.clientX / window.innerWidth - 0.5) * 2
+      mouseY = -(event.clientY / window.innerHeight - 0.5) * 2
+    }
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('resize', resize)
+    const resizeObserver = new ResizeObserver(resize)
+    resizeObserver.observe(container)
+
+    const clock = new THREE.Clock()
+    let animationFrame
+    const animate = () => {
+      animationFrame = requestAnimationFrame(animate)
+      const delta = Math.min(clock.getDelta(), 0.04)
+      const liveBounds = getBounds()
+      for (let index = 0; index < pointsCount; index += 1) {
+        const offset = index * 3
+        nodePositions[offset] += velocities[offset] * delta
+        nodePositions[offset + 1] += velocities[offset + 1] * delta
+        nodePositions[offset + 2] += velocities[offset + 2] * delta
+        if (nodePositions[offset] > liveBounds.x) nodePositions[offset] = -liveBounds.x
+        if (nodePositions[offset] < -liveBounds.x) nodePositions[offset] = liveBounds.x
+        if (nodePositions[offset + 1] > liveBounds.y) nodePositions[offset + 1] = -liveBounds.y
+        if (nodePositions[offset + 1] < -liveBounds.y) nodePositions[offset + 1] = liveBounds.y
+        if (nodePositions[offset + 2] > liveBounds.z) nodePositions[offset + 2] = -liveBounds.z
+        if (nodePositions[offset + 2] < -liveBounds.z) nodePositions[offset + 2] = liveBounds.z
+      }
+      nodePositionAttribute.needsUpdate = true
+      refreshConnections()
+      networkGroup.rotation.y += (mouseX * 0.14 - networkGroup.rotation.y) * 0.02
+      networkGroup.rotation.x += (-mouseY * 0.08 - networkGroup.rotation.x) * 0.02
+      ambientPoints.rotation.y += 0.001
+      renderer.render(scene, camera)
+    }
+    animate()
+
+    return () => {
+      cancelAnimationFrame(animationFrame)
+      resizeObserver.disconnect()
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('resize', resize)
+      nodeGeometry.dispose()
+      nodeMaterial.dispose()
+      lineGeometry.dispose()
+      lineMaterial.dispose()
+      ambientGeometry.dispose()
+      ambientMaterial.dispose()
+      renderer.dispose()
+      if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
+    }
+  }, [pointsCount, color, linkDistance])
+
+  return <div ref={containerRef} className={`particle-network ${className}`.trim()} aria-hidden="true" />
+}
