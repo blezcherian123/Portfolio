@@ -30,9 +30,10 @@ function App() {
         <section className="reference-hero" id="home" aria-labelledby="hero-title">
           <ParticleNetworkBackground
             className="hero-network-canvas"
-            pointsCount={68}
-            linkDistance={2.9}
+            pointsCount={120}
+            linkDistance={2.75}
             color={0x2E86C1}
+            coverage={0.82}
             showAmbientCloud={false}
           />
           <HeroMonogram />

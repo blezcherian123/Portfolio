@@ -22,12 +22,12 @@ export default function HeroMonogram() {
     scene.add(group)
 
     const material = new THREE.MeshPhongMaterial({
-      color: 0x1B6CA8,
-      emissive: 0x0A3860,
-      emissiveIntensity: 0.8,
+      color: 0x2F8FD8,
+      emissive: 0x15599B,
+      emissiveIntensity: 0.95,
       shininess: 100,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.96,
     })
 
     const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 6, 32)
@@ -58,9 +58,9 @@ export default function HeroMonogram() {
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     const particlesMaterial = new THREE.PointsMaterial({
       color: DARK_SKY_BLUE,
-      size: 0.075,
+      size: 0.09,
       transparent: true,
-      opacity: 0.82,
+      opacity: 0.95,
       blending: THREE.AdditiveBlending,
     })
     const points = new THREE.Points(particlesGeometry, particlesMaterial)

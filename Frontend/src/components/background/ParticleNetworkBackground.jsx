@@ -9,6 +9,7 @@ export default function ParticleNetworkBackground({
   pointsCount = 80,
   color = DARK_SKY_BLUE,
   linkDistance = 3.25,
+  coverage = 0.58,
   showAmbientCloud = true,
   className = '',
 }) {
@@ -27,11 +28,14 @@ export default function ParticleNetworkBackground({
     renderer.domElement.style.display = 'block'
     container.appendChild(renderer.domElement)
 
-    const getBounds = () => ({
-      x: Math.max(3.8, camera.aspect * 4.5),
-      y: 4.35,
+    const getBounds = () => {
+      const verticalView = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
+      return {
+      x: Math.max(3.8, verticalView * camera.aspect * coverage),
+      y: verticalView * coverage,
       z: 3.2,
-    })
+      }
+    }
     const resize = () => {
       const width = container.clientWidth || window.innerWidth
       const height = container.clientHeight || window.innerHeight
@@ -175,7 +179,7 @@ export default function ParticleNetworkBackground({
       renderer.dispose()
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
     }
-  }, [pointsCount, color, linkDistance, showAmbientCloud])
+  }, [pointsCount, color, linkDistance, coverage, showAmbientCloud])
 
   return <div ref={containerRef} className={`particle-network ${className}`.trim()} aria-hidden="true" />
 }
