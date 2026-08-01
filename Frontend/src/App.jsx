@@ -28,6 +28,13 @@ function App() {
 
       <main>
         <section className="reference-hero" id="home" aria-labelledby="hero-title">
+          <ParticleNetworkBackground
+            className="hero-network-canvas"
+            pointsCount={68}
+            linkDistance={2.9}
+            color={0x2E86C1}
+            showAmbientCloud={false}
+          />
           <HeroMonogram />
           <div className="reference-hero-content">
             <div className="hero-status"><i aria-hidden="true" /> <span>AI Engineer</span></div>
@@ -46,7 +53,7 @@ function App() {
         </section>
 
         <section className="particle-section" id="work" aria-labelledby="network-heading">
-          <ParticleNetworkBackground className="particle-canvas" pointsCount={80} linkDistance={3.25} color={0x22D3EE} />
+          <ParticleNetworkBackground className="particle-canvas" pointsCount={80} linkDistance={3.25} color={0x2E86C1} />
           <div className="particle-content">
             <p className="section-label">Intelligence in motion</p>
             <h2 id="network-heading">Systems that connect.</h2>

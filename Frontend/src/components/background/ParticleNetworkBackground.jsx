@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+const DARK_SKY_BLUE = 0x2E86C1
+
 // Linked particles for the section, plus the same free-floating cyan cloud
 // used by the hero so both areas feel like one continuous environment.
 export default function ParticleNetworkBackground({
   pointsCount = 80,
-  color = 0x5DE6FF,
+  color = DARK_SKY_BLUE,
   linkDistance = 3.25,
+  showAmbientCloud = true,
   className = '',
 }) {
   const containerRef = useRef(null)
@@ -75,19 +78,24 @@ export default function ParticleNetworkBackground({
     const lines = new THREE.LineSegments(lineGeometry, lineMaterial)
     networkGroup.add(lines)
 
-    // This is deliberately the same free particle cloud as the hero's background.
-    const ambientCount = 200
-    const ambientPositions = new Float32Array(ambientCount * 3)
-    for (let index = 0; index < ambientCount; index += 1) {
-      ambientPositions[index * 3] = (Math.random() - 0.5) * 15
-      ambientPositions[index * 3 + 1] = (Math.random() - 0.5) * 15
-      ambientPositions[index * 3 + 2] = (Math.random() - 0.5) * 15
+    let ambientGeometry
+    let ambientMaterial
+    let ambientPoints
+    if (showAmbientCloud) {
+      // This is deliberately the same free particle cloud as the hero's background.
+      const ambientCount = 200
+      const ambientPositions = new Float32Array(ambientCount * 3)
+      for (let index = 0; index < ambientCount; index += 1) {
+        ambientPositions[index * 3] = (Math.random() - 0.5) * 15
+        ambientPositions[index * 3 + 1] = (Math.random() - 0.5) * 15
+        ambientPositions[index * 3 + 2] = (Math.random() - 0.5) * 15
+      }
+      ambientGeometry = new THREE.BufferGeometry()
+      ambientGeometry.setAttribute('position', new THREE.BufferAttribute(ambientPositions, 3))
+      ambientMaterial = new THREE.PointsMaterial({ color: DARK_SKY_BLUE, size: 0.065, transparent: true, opacity: 0.7 })
+      ambientPoints = new THREE.Points(ambientGeometry, ambientMaterial)
+      scene.add(ambientPoints)
     }
-    const ambientGeometry = new THREE.BufferGeometry()
-    ambientGeometry.setAttribute('position', new THREE.BufferAttribute(ambientPositions, 3))
-    const ambientMaterial = new THREE.PointsMaterial({ color: 0x22D3EE, size: 0.05, transparent: true, opacity: 0.5 })
-    const ambientPoints = new THREE.Points(ambientGeometry, ambientMaterial)
-    scene.add(ambientPoints)
 
     const refreshConnections = () => {
       let vertexCount = 0
@@ -148,7 +156,7 @@ export default function ParticleNetworkBackground({
       refreshConnections()
       networkGroup.rotation.y += (mouseX * 0.14 - networkGroup.rotation.y) * 0.02
       networkGroup.rotation.x += (-mouseY * 0.08 - networkGroup.rotation.x) * 0.02
-      ambientPoints.rotation.y += 0.001
+      if (ambientPoints) ambientPoints.rotation.y += 0.001
       renderer.render(scene, camera)
     }
     animate()
@@ -162,12 +170,12 @@ export default function ParticleNetworkBackground({
       nodeMaterial.dispose()
       lineGeometry.dispose()
       lineMaterial.dispose()
-      ambientGeometry.dispose()
-      ambientMaterial.dispose()
+      ambientGeometry?.dispose()
+      ambientMaterial?.dispose()
       renderer.dispose()
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement)
     }
-  }, [pointsCount, color, linkDistance])
+  }, [pointsCount, color, linkDistance, showAmbientCloud])
 
   return <div ref={containerRef} className={`particle-network ${className}`.trim()} aria-hidden="true" />
 }

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+const DARK_SKY_BLUE = 0x2E86C1
+
 // React version of the supplied Three.js B animation. The geometry, colours,
 // lighting, camera, and interaction values intentionally match the reference.
 export default function HeroMonogram() {
@@ -54,7 +56,13 @@ export default function HeroMonogram() {
     }
     const particlesGeometry = new THREE.BufferGeometry()
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    const particlesMaterial = new THREE.PointsMaterial({ color: 0x22D3EE, size: 0.05, transparent: true, opacity: 0.5 })
+    const particlesMaterial = new THREE.PointsMaterial({
+      color: DARK_SKY_BLUE,
+      size: 0.075,
+      transparent: true,
+      opacity: 0.82,
+      blending: THREE.AdditiveBlending,
+    })
     const points = new THREE.Points(particlesGeometry, particlesMaterial)
     scene.add(points)
 
