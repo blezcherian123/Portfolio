@@ -1,5 +1,6 @@
 import './App.css'
 import HeroMonogram from './components/background/HeroMonogram'
+import HeroGreeting from './components/background/HeroGreeting'
 import FloatingCodeBackground from './components/background/FloatingCodeBackground'
 import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
 
@@ -37,10 +38,23 @@ function App() {
             showAmbientCloud={false}
           />
           <HeroMonogram />
+          <HeroGreeting />
           <div className="reference-hero-content">
-            <div className="hero-status"><i aria-hidden="true" /> <span>AI Engineer</span></div>
+            <div className="hero-status">
+              <i aria-hidden="true" />
+              <span className="role-rotator" aria-label="AI Engineer and Full Stack Developer">
+                <span aria-hidden="true">AI Engineer</span>
+                <span aria-hidden="true">Full Stack Developer</span>
+              </span>
+            </div>
             <h1 id="hero-title">Blesson C Biju</h1>
-            <p>Building Intelligent AI Products That Solve Real Problems</p>
+            {/* <p>Building Intelligent AI Products That Solve Real Problems.</p> */}
+            <p className="hero-intro">From first idea to confident launch, I turn complex data and ambitious ideas into dependable, human-centred AI experiences that create measurable momentum.</p>
+            <ul className="hero-capabilities" aria-label="Core capabilities">
+              <li>AI Strategy</li>
+              <li>Intelligent Automation</li>
+              <li>Production-ready Systems</li>
+            </ul>
             <div className="reference-actions">
               <a className="reference-primary-button" href="#projects">View Projects</a>
               <a className="reference-secondary-button" href="#contact">Contact</a>

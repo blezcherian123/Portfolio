@@ -24,7 +24,7 @@ export default function HeroMonogram() {
     const material = new THREE.MeshPhongMaterial({
       color: 0x2F8FD8,
       emissive: 0x15599B,
-      emissiveIntensity: 0.95,
+      emissiveIntensity: 1.45,
       shininess: 100,
       transparent: true,
       opacity: 0.96,
