@@ -31,9 +31,9 @@ export default function ParticleNetworkBackground({
     const getBounds = () => {
       const verticalView = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
       return {
-      x: Math.max(3.8, verticalView * camera.aspect * coverage),
-      y: verticalView * coverage,
-      z: 3.2,
+        x: Math.max(3.8, verticalView * camera.aspect * coverage),
+        y: verticalView * coverage,
+        z: 3.2,
       }
     }
     const resize = () => {
