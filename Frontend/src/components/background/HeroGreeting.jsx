@@ -5,9 +5,11 @@ import greetingModelUrl from '../../assets/ImageToStl.com_Standing+Greeting.glb?
 
 export default function HeroGreeting() {
   const containerRef = useRef(null)
+  const messageRef = useRef(null)
 
   useEffect(() => {
     const container = containerRef.current
+    const message = messageRef.current
     if (!container) return undefined
 
     const scene = new THREE.Scene()
@@ -34,6 +36,36 @@ export default function HeroGreeting() {
     let animationFrame
     let disposed = false
     let pointerX = 0
+    let showTimer
+    let hideTimer
+
+    let bubbleCleanup
+
+    const showMessageBubble = (clipDuration, mixer) => {
+      if (!message) return
+      const bubbleDurationMs = 600
+      const scheduleBubble = () => {
+        if (disposed) return
+        message.classList.add('is-visible')
+        hideTimer = window.setTimeout(() => {
+          message.classList.remove('is-visible')
+        }, bubbleDurationMs)
+      }
+
+      const onLoop = () => {
+        resetMessageTimers()
+        showTimer = window.setTimeout(scheduleBubble, 3000)
+      }
+
+      mixer.addEventListener('loop', onLoop)
+      showTimer = window.setTimeout(scheduleBubble, 3000)
+      return () => mixer.removeEventListener('loop', onLoop)
+    }
+
+    const resetMessageTimers = () => {
+      window.clearTimeout(showTimer)
+      window.clearTimeout(hideTimer)
+    }
 
     const loader = new GLTFLoader()
     loader.load(greetingModelUrl, (gltf) => {
@@ -55,9 +87,8 @@ export default function HeroGreeting() {
         mixer = new THREE.AnimationMixer(model)
         const greetingClip = gltf.animations[0]
         mixer.clipAction(greetingClip).play()
-        const message = container.parentElement?.querySelector('.hero-greeting-message')
-        message?.style.setProperty('--greeting-duration', `${greetingClip.duration}s`)
         message?.classList.add('is-synced')
+        bubbleCleanup = showMessageBubble(greetingClip.duration, mixer)
       }
     })
 
@@ -87,6 +118,8 @@ export default function HeroGreeting() {
     return () => {
       disposed = true
       cancelAnimationFrame(animationFrame)
+      bubbleCleanup?.()
+      resetMessageTimers()
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', handleMouseMove)
       mixer?.stopAllAction()
@@ -104,7 +137,7 @@ export default function HeroGreeting() {
   return (
     <div className="hero-greeting">
       <div ref={containerRef} className="hero-greeting-canvas" aria-hidden="true" />
-      <p className="hero-greeting-message">Hiiii, Nice to meet you! <span aria-hidden="true">👋</span></p>
+      <p ref={messageRef} className="hero-greeting-message">Hii, Nice to meet you! <span aria-hidden="true">👋</span></p>
     </div>
   )
 }
