@@ -44,7 +44,9 @@ main, .reference-footer { position: relative; z-index: 1; }.reference-hero { pos
   .particle-illustration img:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 35px 90px rgba(14,31,65,.35), 0 0 0 1px rgba(93,230,255,.04); }
 }
 .particle-copy { max-width: 48rem; opacity: 0; transform: translateY(10px); animation: fade-up 0.9s ease-out forwards; animation-delay: .05s; }
-.section-label { margin: 0; color: var(--secondary); font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.section-label { margin: 0; color: rgba(194,198,214,.75); font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.section-label--cyan { color: var(--secondary) !important; }
+.particle-copy .section-label--cyan { color: var(--secondary); }
 .particle-copy h2, .reference-details h2 { margin: 1rem 0; color: #fff; font: 600 clamp(2.25rem, 4.5vw, 4rem)/1.12 'Space Grotesk', sans-serif; letter-spacing: -.03em; }
 .particle-copy p { color: #fff; font-size: 1rem; line-height: 1.65; }
 .reference-details { display: grid; width: min(100%, 1200px); grid-template-columns: 1fr 1fr; gap: 5rem; margin: 0 auto; padding: 7.5rem 2.5rem; }
@@ -52,13 +54,9 @@ main, .reference-footer { position: relative; z-index: 1; }.reference-hero { pos
 .particle-copy { max-width: 48rem; }
 .particle-illustration { width: 100%; display: flex; justify-content: flex-end; align-items: flex-start; opacity: 0; transform: translateY(18px); animation: fade-up 0.9s ease-out forwards; animation-delay: .2s; }
 .particle-illustration img { display: block; width: 100%; height: auto; max-width: 560px; max-height: 540px; border-radius: 1.75rem; box-shadow: 0 30px 80px rgba(14,31,65,.3); filter: drop-shadow(0 0 1.5rem rgba(46,134,193,.18)); transition: transform .35s ease, box-shadow .35s ease; }
-.section-label--cyan { color: var(--secondary); }
 @media (min-width: 901px) {
   .particle-illustration img:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 35px 90px rgba(14,31,65,.35), 0 0 0 1px rgba(93,230,255,.04); }
 }
-.particle-copy { max-width: 48rem; opacity: 0; transform: translateY(10px); animation: fade-up 0.9s ease-out forwards; animation-delay: .05s; }
-.section-label { margin: 0; color: var(--secondary); font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
-.particle-copy h2, .reference-details h2 { margin: 1rem 0; color: #fff; font: 600 clamp(2.25rem, 4.5vw, 4rem)/1.12 'Space Grotesk', sans-serif; letter-spacing: -.03em; }
 /* .particle-copy p { color: rgba(194,198,214,.8); font-size: 1rem; line-height: 1.65; } */
 .reference-details { display: grid; width: min(100%, 1200px); grid-template-columns: 1fr 1fr; gap: 5rem; margin: 0 auto; padding: 7.5rem 2.5rem; }.reference-details article { border-top: 1px solid rgba(66,71,84,.45); padding-top: 2rem; }.reference-details h2 { font-size: clamp(2rem, 3.3vw, 3rem); }.reference-footer { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 2rem max(2.5rem, calc((100vw - 1200px) / 2)); border-top: 1px solid rgba(66,71,84,.2); background: #10131a; color: rgba(194,198,214,.6); font-size: 1rem; }.reference-footer > span:first-child { color: var(--on-surface); font: 700 2rem/1 'Space Grotesk', sans-serif; }.reference-footer div { display: flex; gap: 2rem; }.reference-footer a { color: var(--on-surface-variant); text-decoration: none; }.reference-footer a:hover { color: #d0bcff; }
 
