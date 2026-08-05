@@ -104,7 +104,7 @@ function App() {
           />
           <div className="particle-content">
             <div className="particle-copy">
-              <p className="section-label">Intelligence in motion</p>
+              <p className="section-label section-label--cyan">Intelligence in motion</p>
               <h2 id="network-heading">Bridging Human Cognition with Artificial Systems.</h2>
               <p>I specialize in developing high-performance AI architectures that transcend traditional computing. My focus lies at the intersection of deep learning and computer vision, creating systems that don't just process data—they understand it.</p>
             </div>
