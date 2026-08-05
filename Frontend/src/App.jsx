@@ -1,8 +1,10 @@
 import './App.css'
+import { useEffect, useState } from 'react'
 import HeroMonogram from './components/background/HeroMonogram'
 import HeroGreeting from './components/background/HeroGreeting'
 import FloatingCodeBackground from './components/background/FloatingCodeBackground'
 import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
+import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -12,6 +14,30 @@ const navItems = [
 ]
 
 function App() {
+  const [immersivePhase, setImmersivePhase] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const section = document.getElementById('work')
+      if (!section) return
+      const top = section.getBoundingClientRect().top
+      const windowHeight = window.innerHeight
+      if (top < windowHeight * 0.15) {
+        setImmersivePhase(3)
+      } else if (top < windowHeight * 0.45) {
+        setImmersivePhase(2)
+      } else if (top < windowHeight * 0.8) {
+        setImmersivePhase(1)
+      } else {
+        setImmersivePhase(0)
+      }
+    }
+
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <div className="portfolio-page">
       <FloatingCodeBackground />
@@ -67,12 +93,24 @@ function App() {
           </a>
         </section>
 
-        <section className="particle-section" id="work" aria-labelledby="network-heading">
-          <ParticleNetworkBackground className="particle-canvas" pointsCount={80} linkDistance={3.25} color={0x2E86C1} />
+        <section className={`particle-section immersive-section phase-${immersivePhase}`} id="work" aria-labelledby="network-heading">
+          <ParticleNetworkBackground
+            className="immersive-network-canvas"
+            pointsCount={100}
+            linkDistance={2.8}
+            color={0x2E86C1}
+            coverage={0.94}
+            showAmbientCloud={false}
+          />
           <div className="particle-content">
-            <p className="section-label">Intelligence in motion</p>
-            <h2 id="network-heading">Systems that connect.</h2>
-            <p>Ideas, data, and product thinking working together in one clear direction.</p>
+            <div className="particle-copy">
+              <p className="section-label">Intelligence in motion</p>
+              <h2 id="network-heading">Bridging Human Cognition with Artificial Systems.</h2>
+              <p>I specialize in developing high-performance AI architectures that transcend traditional computing. My focus lies at the intersection of deep learning and computer vision, creating systems that don't just process data—they understand it.</p>
+            </div>
+            <div className="particle-illustration">
+              <img src={portfolioPencilHolding} alt="Portfolio illustration featuring pencil with AI concept" />
+            </div>
           </div>
         </section>
 
