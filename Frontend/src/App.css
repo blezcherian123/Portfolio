@@ -747,21 +747,25 @@ main,
 
 .expertise-heading {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 2.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(93, 230, 255, .16);
+  margin-top: 0.75rem;
 }
 
-.expertise-heading>div {
-  flex-shrink: 0;
-  max-width: 34rem;
+.expertise-heading h2 {
+  margin: 0;
+  max-width: 40rem;
+  font-size: clamp(2rem, 3.3vw, 3rem);
+  line-height: 1.15;
 }
 
 .expertise-subheading {
-  max-width: 30rem;
+  max-width: 32rem;
   margin: 0;
+  padding-top: 0.38rem; /* Offsets slightly to align beautifully with the h2 first-line text baseline */
   color: rgba(194, 198, 214, .84);
   font-size: 1rem;
   line-height: 1.75;
@@ -958,8 +962,8 @@ main,
   position: relative;
   overflow: hidden;
   padding: 0.6rem 0;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 6%, #000 12%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, transparent 6%, #000 12%, #000 92%, transparent 100%);
 }
 
 .marquee-wrap--reverse {
@@ -1247,6 +1251,7 @@ main,
 
   .expertise-subheading {
     max-width: 100%;
+    padding-top: 0;
   }
 
   .expertise-grid {

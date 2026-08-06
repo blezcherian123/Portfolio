@@ -273,11 +273,9 @@ function App() {
         </div>
 
         <section ref={detailsRef} className="reference-details" id="expertise" aria-labelledby="expertise-heading">
+          <p className="section-label section-label--cyan">Expertise</p>
           <div className="expertise-heading">
-            <div>
-              <p className="section-label section-label--cyan">Expertise</p>
-              <h2 id="expertise-heading">AI products with a human centre.</h2>
-            </div>
+            <h2 id="expertise-heading">AI products with a human centre.</h2>
             <p className="expertise-subheading">- From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
