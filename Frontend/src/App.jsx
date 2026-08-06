@@ -8,6 +8,7 @@ import HeroGreeting from './components/background/HeroGreeting'
 import FloatingCodeBackground from './components/background/FloatingCodeBackground'
 import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
 import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
+import myProfileImage from './assets/my-profile.png'
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -92,6 +93,7 @@ function App() {
   const heroSectionRef = useRef(null)
   const detailsRef = useRef(null)
   const expertiseGridRef = useRef(null)
+  const experienceGridRef = useRef(null)
 
   useEffect(() => {
     const onScroll = () => {
@@ -162,6 +164,46 @@ function App() {
         .fromTo(ornaments, { opacity: 0, scale: 0.35, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 1.2, stagger: 0.08, ease: 'back.out(1.7)' }, 0.2)
     }
 
+    // Timeline items scroll-in animation via IntersectionObserver
+    const timelineItems = document.querySelectorAll('.timeline-item')
+    const timelineObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const item = entry.target
+            const delay = Number(item.dataset.delay || 0)
+            setTimeout(() => {
+              item.classList.add('is-visible')
+            }, delay)
+            timelineObserver.unobserve(item)
+          }
+        })
+      },
+      { threshold: 0.25 }
+    )
+    timelineItems.forEach((item, idx) => {
+      item.dataset.delay = idx * 150
+      timelineObserver.observe(item)
+    })
+
+    // Experience section whole-layout scroll animation
+    const expGrid = experienceGridRef.current
+    if (expGrid) {
+      const cols = expGrid.querySelectorAll('.experience-profile-col, .experience-timeline-col')
+      gsap.fromTo(
+        cols,
+        { opacity: 0, y: 48 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.18,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: expGrid, start: 'top 82%', once: true },
+        }
+      )
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -204,6 +246,16 @@ function App() {
           </a>
         ))}
       </aside>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
+        {navItems.map(([id, label, icon]) => (
+          <a className="mobile-nav-item" href={`#${id}`} key={id}>
+            <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
+            <span className="mobile-nav-label">{label}</span>
+          </a>
+        ))}
+      </nav>
 
       <main>
         <section ref={heroSectionRef} className="reference-hero" id="home" aria-labelledby="hero-title">
@@ -265,7 +317,7 @@ function App() {
             </div>
           </div>
 
-          <div className="experience-grid-layout">
+          <div className="experience-grid-layout" ref={experienceGridRef}>
             {/* Left Column: About/Profile Card */}
             <div className="experience-profile-col">
               <div className="glass-panel profile-card-wrap">
@@ -273,7 +325,7 @@ function App() {
                   <img
                     className="profile-cyber-image"
                     alt="Blesson C Biju AI Engineer"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCY461S3Cb9jsn93ujHtt8ZtcoRZJoZU3Xwr-6bBE4wA24gBxU4Nwraqa6dnYhzJGNZbsZXW4JarKOGIaae9c14jd3FpDBEoHz8hgDnnxMNzxhqiTL48CADu2hUHoxT0Te33dvztaSisU8O0Np2HsGbMICfwqk_eD3BEJbWM1F14ExoQXFqQOn_alBXpkRGzqWBy8uvktuzf9Ggawb3WU7Hb2E32RyEtajox1ekJEyDu-aJNjbVWKWe"
+                    src={myProfileImage}
                   />
                   <div className="profile-image-gradient-overlay" />
                 </div>
@@ -292,6 +344,7 @@ function App() {
                 </div>
               </div>
 
+              {/* 
               <div className="glass-panel philosophy-card-wrap">
                 <h4 className="philosophy-title">
                   <span className="material-symbols-outlined philosophy-icon" aria-hidden="true">bolt</span>
@@ -300,6 +353,18 @@ function App() {
                 <p className="philosophy-body-text">
                   "Complexity is a debt; simplicity is the dividend. I strive to build systems that are not just intelligent, but inherently transparent and resilient."
                 </p>
+              </div>
+              */}
+
+              <div className="glass-panel education-card-wrap">
+                <h4 className="education-title">
+                  <span className="material-symbols-outlined education-icon" aria-hidden="true">school</span>
+                  Education
+                </h4>
+                <div className="education-degree">Bachelor of Technology (B.Tech) - Computer Science</div>
+                <div className="education-university">APJ Abdul Kalam Technological University (KTU)</div>
+                <div className="education-college">Mar Baselios Christian College of Engineering and Technology, Kuttikanam</div>
+                <div className="education-year">2020 – 2024</div>
               </div>
             </div>
 
