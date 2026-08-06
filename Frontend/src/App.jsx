@@ -28,6 +28,35 @@ const expertiseItems = [
   { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'violet' },
 ]
 
+const experiences = [
+  {
+    period: '05/2025 – Present',
+    role: 'AI Engineer',
+    company: 'Adam Finastra',
+    location: 'Kozhikode',
+    color: 'primary',
+    bullets: [
+      'Built AI-powered applications and intelligent automation systems using Generative AI and modern backend technologies.',
+      'Developed AI-driven marketing and content generation workflows capable of generating captions & assets automatically.',
+      'Designed and orchestrated robust AI agent workflows, API integrations, and automated processing pipelines.',
+      'Implemented high-performance backend systems using Python, Django, FastAPI, Celery, Redis, and PostgreSQL.'
+    ]
+  },
+  {
+    period: '07/2024 – 04/2025',
+    role: 'Data Science Intern',
+    company: 'Techolas Technologies',
+    location: 'Kochi',
+    color: 'secondary',
+    bullets: [
+      'Analyzed and processed large datasets using Python, SQL, Pandas, and NumPy to extract business insights.',
+      'Developed and optimized machine learning models for predictive analytics and performance improvement.',
+      'Worked on data preprocessing, feature engineering, and model evaluation techniques for real-world datasets.',
+      'Created interactive dashboards and visual reports using Tableau and Power BI to support decision-making.'
+    ]
+  }
+]
+
 const aiSkillsCore = [
   'Python',
   'PyTorch',
@@ -235,6 +264,72 @@ function App() {
               <img src={portfolioPencilHolding} alt="Portfolio illustration featuring pencil with AI concept" />
             </div>
           </div>
+
+          <div className="experience-grid-layout">
+            {/* Left Column: About/Profile Card */}
+            <div className="experience-profile-col">
+              <div className="glass-panel profile-card-wrap">
+                <div className="profile-image-container">
+                  <img
+                    className="profile-cyber-image"
+                    alt="Blesson C Biju AI Engineer"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCY461S3Cb9jsn93ujHtt8ZtcoRZJoZU3Xwr-6bBE4wA24gBxU4Nwraqa6dnYhzJGNZbsZXW4JarKOGIaae9c14jd3FpDBEoHz8hgDnnxMNzxhqiTL48CADu2hUHoxT0Te33dvztaSisU8O0Np2HsGbMICfwqk_eD3BEJbWM1F14ExoQXFqQOn_alBXpkRGzqWBy8uvktuzf9Ggawb3WU7Hb2E32RyEtajox1ekJEyDu-aJNjbVWKWe"
+                  />
+                  <div className="profile-image-gradient-overlay" />
+                </div>
+                <div className="profile-identity-content">
+                  <h3 className="profile-name-text">Blesson C Biju</h3>
+                  <p className="profile-role-title">AI Engineering Specialist</p>
+                  <p className="profile-bio-text">
+                    Pioneering the intersection of algorithmic efficiency and architectural elegance. I architect robust machine learning ecosystems designed for high-stakes enterprise environments, ensuring scalability meets ethical integrity.
+                  </p>
+                </div>
+                <div className="profile-tags-chips">
+                  <span className="profile-tag-chip">Machine Learning</span>
+                  <span className="profile-tag-chip">System Architecture</span>
+                  <span className="profile-tag-chip">AI Ethics</span>
+                  <span className="profile-tag-chip">Deep Learning</span>
+                </div>
+              </div>
+
+              <div className="glass-panel philosophy-card-wrap">
+                <h4 className="philosophy-title">
+                  <span className="material-symbols-outlined philosophy-icon" aria-hidden="true">bolt</span>
+                  Core Philosophy
+                </h4>
+                <p className="philosophy-body-text">
+                  "Complexity is a debt; simplicity is the dividend. I strive to build systems that are not just intelligent, but inherently transparent and resilient."
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Experience Timeline Card */}
+            <div className="experience-timeline-col">
+              <div className="glass-panel experience-card-wrap">
+                <h3 className="timeline-title">Professional Experience</h3>
+                <div className="timeline-journey">
+                  <div className="timeline-line" />
+                  {experiences.map((exp, idx) => (
+                    <div className="timeline-item group" key={idx}>
+                      <div className={`timeline-dot timeline-dot--${exp.color}`} />
+                      <div className="timeline-content">
+                        <span className="timeline-date">{exp.period}</span>
+                        <h4 className="timeline-role">
+                          {exp.role} <span className="timeline-company">@ {exp.company}</span>
+                        </h4>
+                        <span className="timeline-location">{exp.location}</span>
+                        <ul className="timeline-bullets">
+                          {exp.bullets.map((bullet, bIdx) => (
+                            <li key={bIdx}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="tools-marquee-section" id="skills" aria-label="Tools and Technologies">
@@ -276,7 +371,7 @@ function App() {
           <p className="section-label section-label--cyan">Expertise</p>
           <div className="expertise-heading">
             <h2 id="expertise-heading">AI products with a human centre.</h2>
-            <p className="expertise-subheading">- From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
+            <p className="expertise-subheading">From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
             {expertiseItems.map((item) => (
