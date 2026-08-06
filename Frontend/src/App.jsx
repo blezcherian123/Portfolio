@@ -11,6 +11,7 @@ import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
 
 const navItems = [
   ['work', 'Experience', 'work'],
+  ['skills', 'Skills', 'code'],
   ['expertise', 'Expertise', 'bolt'],
   ['projects', 'Projects', 'folder_special'],
   ['workflow', 'Workflow', 'account_tree'],
@@ -18,11 +19,13 @@ const navItems = [
 
 const expertiseItems = [
   { icon: 'neurology', title: 'LLM & Generative AI', description: 'Fine-tuning, retrieval-augmented pipelines, and prompt systems that stay reliable in production.', tags: ['PyTorch', 'LangChain', 'RAG'], tone: 'blue' },
+  { icon: 'videocam', title: 'Computer Vision & Vision AI', description: 'Real-time facial emotion recognition, OpenCV video processing streams, and vision inference models.', tags: ['OpenCV', 'Deep Learning', 'PyTorch'], tone: 'cyan' },
   { icon: 'query_stats', title: 'Machine Learning', description: 'Predictive models and deep learning systems built on a foundation of clean, well-understood data.', tags: ['TensorFlow', 'scikit-learn', 'Pandas'], tone: 'cyan' },
-  { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Airflow', 'Postgres', 'Pinecone'], tone: 'violet' },
+  { icon: 'sync_alt', title: 'Async & Distributed Systems', description: 'High-throughput task queues, Celery workers, and Redis caching for distributed asynchronous workloads.', tags: ['Celery', 'Redis', 'FastAPI'], tone: 'violet' },
+  { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Postgres', 'ChromaDB', 'Pinecone'], tone: 'violet' },
   { icon: 'favorite', title: 'Human-Centred Design', description: 'Research and UX writing that keep the person on the other side of the model in view.', tags: ['Figma', 'User Research', 'UX Writing'], tone: 'blue' },
   { icon: 'widgets', title: 'Product Engineering', description: 'Turning a working model into a product people can open, trust, and actually use.', tags: ['React', 'FastAPI', 'Docker'], tone: 'cyan' },
-  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Kubernetes', 'MLflow'], tone: 'violet' },
+  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'violet' },
 ]
 
 const aiSkillsCore = [
@@ -234,7 +237,7 @@ function App() {
           </div>
         </section>
 
-        <section className="tools-marquee-section" aria-label="Tools and Technologies">
+        <section className="tools-marquee-section" id="skills" aria-label="Tools and Technologies">
           <div className="marquee-header">
             <p className="marquee-label">Tools & Technologies</p>
           </div>
@@ -272,10 +275,10 @@ function App() {
         <section ref={detailsRef} className="reference-details" id="expertise" aria-labelledby="expertise-heading">
           <div className="expertise-heading">
             <div>
-              <p className="section-label">Expertise</p>
+              <p className="section-label section-label--cyan">Expertise</p>
               <h2 id="expertise-heading">AI products with a human centre.</h2>
             </div>
-            <p>From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
+            <p className="expertise-subheading">- From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
             {expertiseItems.map((item) => (
