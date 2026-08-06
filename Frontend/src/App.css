@@ -588,13 +588,13 @@ main,
 
 .particle-section .particle-content {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(360px, 36rem);
-  gap: 3rem;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
   max-width: 84rem;
   width: min(100%, 1100px);
   margin: 0 auto;
   text-align: left;
-  align-items: start;
+  align-items: center;
 }
 
 .particle-copy {
@@ -665,9 +665,9 @@ main,
 }
 
 .particle-copy p {
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1.65;
+  color: rgba(225, 226, 236, 0.85);
+  font-size: 1.05rem;
+  line-height: 1.75;
 }
 
 .reference-details {
