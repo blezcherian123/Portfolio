@@ -12,10 +12,13 @@ export default function HeroMonogram() {
     const container = containerRef.current
     if (!container) return undefined
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isCompactViewport = window.innerWidth < 900
+
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !prefersReducedMotion })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion || isCompactViewport ? 1 : 1.4))
     container.appendChild(renderer.domElement)
 
     const group = new THREE.Group()
@@ -47,7 +50,7 @@ export default function HeroMonogram() {
     bottomCurve.rotation.z = -Math.PI / 2
     group.add(bottomCurve)
 
-    const particlesCount = 200
+    const particlesCount = prefersReducedMotion || isCompactViewport ? 120 : 200
     const positions = new Float32Array(particlesCount * 3)
     for (let index = 0; index < particlesCount; index += 1) {
       positions[index * 3] = (Math.random() - 0.5) * 15
@@ -93,11 +96,13 @@ export default function HeroMonogram() {
     let animationFrame
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
-      group.rotation.y += 0.01
-      group.rotation.x += 0.005
-      group.rotation.y += (mouseX * 0.5 - group.rotation.y) * 0.05
-      group.rotation.x += (-mouseY * 0.5 - group.rotation.x) * 0.05
-      points.rotation.y += 0.001
+      if (!prefersReducedMotion) {
+        group.rotation.y += 0.01
+        group.rotation.x += 0.005
+        group.rotation.y += (mouseX * 0.5 - group.rotation.y) * 0.05
+        group.rotation.x += (-mouseY * 0.5 - group.rotation.x) * 0.05
+        points.rotation.y += 0.001
+      }
       renderer.render(scene, camera)
     }
     animate()

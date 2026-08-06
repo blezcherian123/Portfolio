@@ -13,6 +13,8 @@ export default function FloatingCodeBackground() {
   useEffect(() => {
     const container = containerRef.current
     if (!container) return undefined
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const snippetBudget = prefersReducedMotion ? 6 : 8
     const timeouts = []
     const createSnippet = () => {
       const snippet = document.createElement('span')
@@ -25,8 +27,8 @@ export default function FloatingCodeBackground() {
       const cleanup = window.setTimeout(() => snippet.remove(), 25000)
       timeouts.push(cleanup)
     }
-    for (let index = 0; index < 15; index += 1) timeouts.push(window.setTimeout(createSnippet, Math.random() * 10000))
-    const interval = window.setInterval(createSnippet, 3000)
+    for (let index = 0; index < snippetBudget; index += 1) timeouts.push(window.setTimeout(createSnippet, Math.random() * 10000))
+    const interval = window.setInterval(createSnippet, 4500)
     return () => { window.clearInterval(interval); timeouts.forEach(window.clearTimeout) }
   }, [])
 

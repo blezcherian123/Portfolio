@@ -19,12 +19,17 @@ export default function ParticleNetworkBackground({
     const container = containerRef.current
     if (!container) return undefined
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isCompactViewport = window.innerWidth < 900
+    const nodeCount = Math.max(24, Math.min(pointsCount, prefersReducedMotion ? 56 : isCompactViewport ? 70 : pointsCount))
+    const refreshEveryFrames = prefersReducedMotion ? 3 : 2
+
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
     camera.position.z = 10
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !prefersReducedMotion })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion ? 1.2 : 1.5))
     renderer.domElement.style.display = 'block'
     container.appendChild(renderer.domElement)
 
@@ -48,9 +53,9 @@ export default function ParticleNetworkBackground({
     const networkGroup = new THREE.Group()
     scene.add(networkGroup)
     const bounds = getBounds()
-    const nodePositions = new Float32Array(pointsCount * 3)
-    const velocities = new Float32Array(pointsCount * 3)
-    for (let index = 0; index < pointsCount; index += 1) {
+    const nodePositions = new Float32Array(nodeCount * 3)
+    const velocities = new Float32Array(nodeCount * 3)
+    for (let index = 0; index < nodeCount; index += 1) {
       nodePositions[index * 3] = (Math.random() * 2 - 1) * bounds.x
       nodePositions[index * 3 + 1] = (Math.random() * 2 - 1) * bounds.y
       nodePositions[index * 3 + 2] = (Math.random() * 2 - 1) * bounds.z
@@ -72,7 +77,7 @@ export default function ParticleNetworkBackground({
     })
     networkGroup.add(new THREE.Points(nodeGeometry, nodeMaterial))
 
-    const linePositions = new Float32Array(pointsCount * (pointsCount - 1) * 3)
+    const linePositions = new Float32Array(nodeCount * (nodeCount - 1) * 3)
     const lineGeometry = new THREE.BufferGeometry()
     const linePositionAttribute = new THREE.BufferAttribute(linePositions, 3)
     linePositionAttribute.setUsage(THREE.DynamicDrawUsage)
@@ -104,8 +109,8 @@ export default function ParticleNetworkBackground({
     const refreshConnections = () => {
       let vertexCount = 0
       const maxDistanceSquared = linkDistance * linkDistance
-      for (let first = 0; first < pointsCount; first += 1) {
-        for (let second = first + 1; second < pointsCount; second += 1) {
+      for (let first = 0; first < nodeCount; first += 1) {
+        for (let second = first + 1; second < nodeCount; second += 1) {
           const firstOffset = first * 3
           const secondOffset = second * 3
           const deltaX = nodePositions[firstOffset] - nodePositions[secondOffset]
@@ -140,11 +145,12 @@ export default function ParticleNetworkBackground({
 
     const clock = new THREE.Clock()
     let animationFrame
+    let frameCount = 0
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
       const delta = Math.min(clock.getDelta(), 0.04)
       const liveBounds = getBounds()
-      for (let index = 0; index < pointsCount; index += 1) {
+      for (let index = 0; index < nodeCount; index += 1) {
         const offset = index * 3
         nodePositions[offset] += velocities[offset] * delta
         nodePositions[offset + 1] += velocities[offset + 1] * delta
@@ -157,10 +163,15 @@ export default function ParticleNetworkBackground({
         if (nodePositions[offset + 2] < -liveBounds.z) nodePositions[offset + 2] = liveBounds.z
       }
       nodePositionAttribute.needsUpdate = true
-      refreshConnections()
-      networkGroup.rotation.y += (mouseX * 0.14 - networkGroup.rotation.y) * 0.02
-      networkGroup.rotation.x += (-mouseY * 0.08 - networkGroup.rotation.x) * 0.02
-      if (ambientPoints) ambientPoints.rotation.y += 0.001
+      if (frameCount % refreshEveryFrames === 0) {
+        refreshConnections()
+      }
+      frameCount += 1
+      if (!prefersReducedMotion) {
+        networkGroup.rotation.y += (mouseX * 0.14 - networkGroup.rotation.y) * 0.02
+        networkGroup.rotation.x += (-mouseY * 0.08 - networkGroup.rotation.x) * 0.02
+      }
+      if (ambientPoints && !prefersReducedMotion) ambientPoints.rotation.y += 0.001
       renderer.render(scene, camera)
     }
     animate()

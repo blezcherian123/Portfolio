@@ -1,5 +1,7 @@
 import './App.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import HeroMonogram from './components/background/HeroMonogram'
 import HeroGreeting from './components/background/HeroGreeting'
 import FloatingCodeBackground from './components/background/FloatingCodeBackground'
@@ -13,8 +15,13 @@ const navItems = [
   ['workflow', 'Workflow', 'account_tree'],
 ]
 
+gsap.registerPlugin(ScrollTrigger)
+
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
+  const heroContentRef = useRef(null)
+  const heroSectionRef = useRef(null)
+  const detailsRef = useRef(null)
 
   useEffect(() => {
     const onScroll = () => {
@@ -35,7 +42,48 @@ function App() {
 
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+
+    const heroContent = heroContentRef.current
+    const heroSection = heroSectionRef.current
+    const details = detailsRef.current
+
+    if (heroContent && heroSection) {
+      gsap.fromTo(
+        heroContent,
+        { opacity: 0, y: 24 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+          delay: 0.15,
+        },
+      )
+    }
+
+    if (details) {
+      gsap.fromTo(
+        details.children,
+        { opacity: 0, y: 22 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: details,
+            start: 'top 80%',
+            once: true,
+          },
+        },
+      )
+    }
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
   }, [])
 
   return (
@@ -54,7 +102,7 @@ function App() {
       </aside>
 
       <main>
-        <section className="reference-hero" id="home" aria-labelledby="hero-title">
+        <section ref={heroSectionRef} className="reference-hero" id="home" aria-labelledby="hero-title">
           <ParticleNetworkBackground
             className="hero-network-canvas"
             pointsCount={180}
@@ -65,7 +113,7 @@ function App() {
           />
           <HeroMonogram />
           <HeroGreeting />
-          <div className="reference-hero-content">
+          <div ref={heroContentRef} className="reference-hero-content">
             <div className="hero-status">
               <i aria-hidden="true" />
               <span className="role-rotator" aria-label="AI Engineer and Full Stack Developer">
@@ -114,7 +162,7 @@ function App() {
           </div>
         </section>
 
-        <section className="reference-details" id="expertise">
+        <section ref={detailsRef} className="reference-details" id="expertise">
           <article><p className="section-label">Expertise</p><h2>AI products with a human centre.</h2></article>
           <article id="projects"><p>From the first spark to a polished release, I create useful digital experiences with care and precision.</p></article>
           <span className="workflow-anchor" id="workflow" aria-hidden="true" />

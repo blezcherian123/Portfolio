@@ -12,12 +12,16 @@ export default function HeroGreeting() {
     const message = messageRef.current
     if (!container) return undefined
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isCompactViewport = window.innerWidth < 900
+    const shouldAnimate = !prefersReducedMotion && !isCompactViewport
+
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100)
     camera.position.set(0, 0.2, 10)
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !prefersReducedMotion })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion || isCompactViewport ? 1 : 1.25))
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.domElement.style.display = 'block'
     container.appendChild(renderer.domElement)
@@ -109,8 +113,10 @@ export default function HeroGreeting() {
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
       const delta = Math.min(clock.getDelta(), 0.04)
-      mixer?.update(delta)
-      if (model) model.rotation.y += (pointerX * 0.18 - model.rotation.y) * 0.025
+      if (shouldAnimate) {
+        mixer?.update(delta)
+        if (model) model.rotation.y += (pointerX * 0.18 - model.rotation.y) * 0.025
+      }
       renderer.render(scene, camera)
     }
     animate()
