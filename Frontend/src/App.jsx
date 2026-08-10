@@ -9,6 +9,7 @@ import FloatingCodeBackground from './components/background/FloatingCodeBackgrou
 import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
 import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
 import myProfileImage from './assets/my-profile.png'
+import ThemeToggler from './components/ThemeToggler'
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -24,9 +25,7 @@ const expertiseItems = [
   { icon: 'query_stats', title: 'Machine Learning', description: 'Predictive models and deep learning systems built on a foundation of clean, well-understood data.', tags: ['TensorFlow', 'scikit-learn', 'Pandas'], tone: 'cyan' },
   { icon: 'sync_alt', title: 'Async & Distributed Systems', description: 'High-throughput task queues, Celery workers, and Redis caching for distributed asynchronous workloads.', tags: ['Celery', 'Redis', 'FastAPI'], tone: 'violet' },
   { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Postgres', 'ChromaDB', 'Pinecone'], tone: 'violet' },
-  { icon: 'favorite', title: 'Human-Centred Design', description: 'Research and UX writing that keep the person on the other side of the model in view.', tags: ['Figma', 'User Research', 'UX Writing'], tone: 'blue' },
-  { icon: 'widgets', title: 'Product Engineering', description: 'Turning a working model into a product people can open, trust, and actually use.', tags: ['React', 'FastAPI', 'Docker'], tone: 'cyan' },
-  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'violet' },
+  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'blue' },
 ]
 
 const experiences = [
@@ -262,7 +261,10 @@ function App() {
     <div className="portfolio-page">
       <FloatingCodeBackground />
 
-      <a className="reference-contact" href="#contact">Contact</a>
+      <div className="top-nav-bar">
+        <ThemeToggler />
+        <a className="reference-contact" href="#contact">Contact</a>
+      </div>
 
       <aside className="reference-side-nav" aria-label="Section navigation">
         {navItems.map(([id, label, icon], index) => (
