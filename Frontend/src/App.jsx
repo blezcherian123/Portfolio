@@ -87,6 +87,32 @@ const aiSkillsInfra = [
 
 gsap.registerPlugin(ScrollTrigger)
 
+function RoleCycler({ roles, interval = 2800 }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [animState, setAnimState] = useState('visible') // 'visible' | 'exit' | 'enter'
+
+  useEffect(() => {
+    const tick = setInterval(() => {
+      // Step 1: fade-slide out
+      setAnimState('exit')
+      setTimeout(() => {
+        // Step 2: swap text (invisible)
+        setCurrentIndex(i => (i + 1) % roles.length)
+        setAnimState('enter')
+        // Step 3: fade-slide in
+        setTimeout(() => setAnimState('visible'), 40)
+      }, 320)
+    }, interval)
+    return () => clearInterval(tick)
+  }, [roles, interval])
+
+  return (
+    <p className={`profile-role-title profile-role-title--${animState}`}>
+      {roles[currentIndex]}
+    </p>
+  )
+}
+
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
   const heroContentRef = useRef(null)
@@ -331,16 +357,16 @@ function App() {
                 </div>
                 <div className="profile-identity-content">
                   <h3 className="profile-name-text">Blesson C Biju</h3>
-                  <p className="profile-role-title">AI Engineering Specialist</p>
+                  <RoleCycler roles={['AI Engineer', 'Full Stack Developer']} />
                   <p className="profile-bio-text">
-                    Pioneering the intersection of algorithmic efficiency and architectural elegance. I architect robust machine learning ecosystems designed for high-stakes enterprise environments, ensuring scalability meets ethical integrity.
+                    Architecting next-generation Generative AI products, autonomous agentic workflows, and high-performance backend systems. I transform complex business operations into resilient, self-adapting software that delivers real-world impact.
                   </p>
                 </div>
                 <div className="profile-tags-chips">
-                  <span className="profile-tag-chip">Machine Learning</span>
-                  <span className="profile-tag-chip">System Architecture</span>
-                  <span className="profile-tag-chip">AI Ethics</span>
-                  <span className="profile-tag-chip">Deep Learning</span>
+                  <span className="profile-tag-chip">Generative AI</span>
+                  <span className="profile-tag-chip">AI Agents</span>
+                  <span className="profile-tag-chip">Intelligent Automation</span>
+                  <span className="profile-tag-chip">Scalable Systems</span>
                 </div>
               </div>
 
@@ -364,7 +390,20 @@ function App() {
                 <div className="education-degree">Bachelor of Technology (B.Tech) - Computer Science</div>
                 <div className="education-university">APJ Abdul Kalam Technological University (KTU)</div>
                 <div className="education-college">Mar Baselios Christian College of Engineering and Technology, Kuttikanam</div>
-                <div className="education-year">2020 – 2024</div>
+                <div className="education-footer">
+                  <div className="education-year">2020 – 2024</div>
+                  <a
+                    href="https://maps.app.goo.gl/a5i4EdhuGm4Q8tc18"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="education-location-btn"
+                    title="View Mar Baselios Christian College of Engineering and Technology on Google Maps"
+                  >
+                    <span className="material-symbols-outlined location-pin-icon" aria-hidden="true">location_on</span>
+                    <span>View Location</span>
+                    <span className="material-symbols-outlined open-icon" aria-hidden="true">north_east</span>
+                  </a>
+                </div>
               </div>
             </div>
 
