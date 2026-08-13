@@ -2,9 +2,12 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
 const DARK_SKY_BLUE = 0x2E86C1
+const DARK_BLUE = THREE.Color.NAMES.darkblue
+const DARK_BLUE_EMISSIVE = 0x000040
 
 // React version of the supplied Three.js B animation. The geometry, colours,
 // lighting, camera, and interaction values intentionally match the reference.
+// The monogram uses the same dark blue in both light and dark themes.
 export default function HeroMonogram() {
   const containerRef = useRef(null)
 
@@ -25,8 +28,8 @@ export default function HeroMonogram() {
     scene.add(group)
 
     const material = new THREE.MeshPhongMaterial({
-      color: 0x2F8FD8,
-      emissive: 0x15599B,
+      color: DARK_BLUE,
+      emissive: DARK_BLUE_EMISSIVE,
       emissiveIntensity: 1.45,
       shininess: 100,
       transparent: true,

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
 const DARK_SKY_BLUE = 0x2E86C1
+const LIGHT_NETWORK_COLOR = 0x1A56DB
 
 // Linked particles for the section, plus the same free-floating cyan cloud
 // used by the hero so both areas feel like one continuous environment.
@@ -106,6 +107,22 @@ export default function ParticleNetworkBackground({
       scene.add(ambientPoints)
     }
 
+    const applyThemeColors = () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light'
+      const targetColor = isLight ? LIGHT_NETWORK_COLOR : DARK_SKY_BLUE
+      nodeMaterial.color.setHex(targetColor)
+      lineMaterial.color.setHex(targetColor)
+      if (ambientMaterial) ambientMaterial.color.setHex(targetColor)
+      nodeMaterial.blending = isLight ? THREE.NormalBlending : THREE.AdditiveBlending
+      nodeMaterial.opacity = isLight ? 0.7 : 0.62
+      lineMaterial.opacity = isLight ? 0.3 : 0.1
+      nodeMaterial.needsUpdate = true
+      lineMaterial.needsUpdate = true
+    }
+    applyThemeColors()
+    const themeObserver = new MutationObserver(() => applyThemeColors())
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+
     const refreshConnections = () => {
       let vertexCount = 0
       const maxDistanceSquared = linkDistance * linkDistance
@@ -178,6 +195,7 @@ export default function ParticleNetworkBackground({
 
     return () => {
       cancelAnimationFrame(animationFrame)
+      themeObserver.disconnect()
       resizeObserver.disconnect()
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', resize)

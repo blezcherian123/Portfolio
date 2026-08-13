@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 /**
- * ThemeToggler — animated dark / light mode button.
+ * ThemeToggler ï¿½ animated dark / light mode button.
  * Writes `data-theme` on <html> and persists to localStorage.
  * On first load it respects prefers-color-scheme.
  */
@@ -18,8 +18,30 @@ export default function ThemeToggler() {
     localStorage.setItem('portfolio-theme', theme)
   }, [theme])
 
-  const toggle = () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))
+  const applyTheme = (next) => {
+    document.documentElement.classList.add('is-theme-transitioning')
+    document.documentElement.setAttribute('data-theme', next)
+    localStorage.setItem('portfolio-theme', next)
+  }
+
+  const finishTheme = (next) => {
+    document.documentElement.classList.remove('is-theme-transitioning')
+    setTheme(next)
+  }
+
   const isDark = theme === 'dark'
+
+  const toggle = () => {
+    const next = isDark ? 'light' : 'dark'
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!document.startViewTransition || prefersReducedMotion) {
+      applyTheme(next)
+      finishTheme(next)
+      return
+    }
+    const transition = document.startViewTransition(() => applyTheme(next))
+    transition.finished.then(() => finishTheme(next))
+  }
 
   return (
     <button

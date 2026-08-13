@@ -34,6 +34,7 @@ const experiences = [
     role: 'AI Engineer',
     company: 'Adam Finastra',
     location: 'Kozhikode',
+    locationUrl: 'https://maps.app.goo.gl/jr3RUwj95iW45woT8',
     color: 'primary',
     bullets: [
       'Built AI-powered applications and intelligent automation systems using Generative AI and modern backend technologies.',
@@ -47,6 +48,7 @@ const experiences = [
     role: 'Data Science Intern',
     company: 'Techolas Technologies',
     location: 'Kochi',
+    locationUrl: 'https://maps.app.goo.gl/2yY8WKMQbYD5sFDj8',
     color: 'secondary',
     bullets: [
       'Analyzed and processed large datasets using Python, SQL, Pandas, and NumPy to extract business insights.',
@@ -423,7 +425,22 @@ function App() {
                         <h4 className="timeline-role">
                           {exp.role} <span className="timeline-company">@ {exp.company}</span>
                         </h4>
-                        <span className="timeline-location">{exp.location}</span>
+                        <div className="timeline-location-row">
+                          <span className="timeline-location">{exp.location}</span>
+                          {exp.locationUrl && (
+                            <a
+                              href={exp.locationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="timeline-location-btn"
+                              title={`View ${exp.company} on Google Maps`}
+                            >
+                              <span className="material-symbols-outlined location-pin-icon" aria-hidden="true">location_on</span>
+                              <span>View Location</span>
+                              <span className="material-symbols-outlined open-icon" aria-hidden="true">north_east</span>
+                            </a>
+                          )}
+                        </div>
                         <ul className="timeline-bullets">
                           {exp.bullets.map((bullet, bIdx) => (
                             <li key={bIdx}>{bullet}</li>
@@ -439,6 +456,14 @@ function App() {
         </section>
 
         <section className="tools-marquee-section" id="skills" aria-label="Tools and Technologies">
+          <ParticleNetworkBackground
+            className="section-network-canvas"
+            pointsCount={70}
+            linkDistance={2.8}
+            color={0x2E86C1}
+            coverage={0.9}
+            showAmbientCloud={false}
+          />
           <div className="marquee-header">
             <p className="marquee-label">Tools & Technologies</p>
           </div>
@@ -474,6 +499,14 @@ function App() {
         </div>
 
         <section ref={detailsRef} className="reference-details" id="expertise" aria-labelledby="expertise-heading">
+          <ParticleNetworkBackground
+            className="section-network-canvas"
+            pointsCount={80}
+            linkDistance={2.9}
+            color={0x2E86C1}
+            coverage={0.95}
+            showAmbientCloud={false}
+          />
           <p className="section-label section-label--cyan">Expertise</p>
           <div className="expertise-heading">
             <h2 id="expertise-heading">AI products with a human centre.</h2>

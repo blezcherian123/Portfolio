@@ -14,6 +14,9 @@
   --secondary: #5de6ff;
   --secondary-dim: rgba(93, 230, 255, 0.16);
   --secondary-glow: rgba(93, 230, 255, 0.12);
+  /* Liquid contact button fill */
+  --liquid-fill: #5de6ff;
+  --liquid-fill-text: #062a5c;
   /* Glass / card surfaces */
   --glass-bg: rgba(10, 13, 20, 0.45);
   --glass-border: rgba(93, 230, 255, 0.16);
@@ -50,6 +53,8 @@
   --secondary: #0369a1;
   --secondary-dim: rgba(3, 105, 161, 0.14);
   --secondary-glow: rgba(3, 105, 161, 0.1);
+  --liquid-fill: #0369a1;
+  --liquid-fill-text: #ffffff;
   --glass-bg: rgba(255, 255, 255, 0.72);
   --glass-border: rgba(26, 86, 219, 0.18);
   --glass-border-hover: rgba(26, 86, 219, 0.4);
@@ -141,16 +146,20 @@
   position: relative;
   padding: .5rem 1.5rem;
   border-radius: 999px;
-  color: var(--on-primary);
-  background-color: var(--primary);
-  box-shadow: 0 0 40px rgba(173, 198, 255, .1);
+  color: var(--primary);
+  background-color: var(--on-primary);
+  background-image: linear-gradient(var(--liquid-fill) 0 0);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0px;
+  box-shadow: 0 0 26px rgba(173, 198, 255, .22), 0 0 60px rgba(15, 76, 155, .18);
   font-size: .875rem;
   font-weight: 500;
   letter-spacing: .02em;
   text-decoration: none;
   overflow: hidden;
   transform: translateY(0) scale(1);
-  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease, background-size .55s cubic-bezier(.65, 0, .35, 1), color .3s ease .25s;
 }
 
 .reference-contact::before {
@@ -164,13 +173,17 @@
   transition: opacity .25s ease;
 }
 
-.reference-contact:hover {
+.reference-contact:hover,
+.reference-contact:focus-visible {
   transform: translateY(-1px) scale(1.03);
   box-shadow: 0 0 30px rgba(93, 230, 255, .24), 0 0 70px rgba(15, 76, 155, .18);
   filter: saturate(1.1);
+  background-size: 100% 100%;
+  color: var(--liquid-fill-text);
 }
 
-.reference-contact:hover::before {
+.reference-contact:hover::before,
+.reference-contact:focus-visible::before {
   opacity: 1;
 }
 
@@ -300,10 +313,31 @@ main,
   pointer-events: none;
 }
 
+/* Soft floor shadow that grounds the greeting model above the hero edge so the
+   character's feet read as standing inside the hero, not cut by it. */
+.hero-greeting::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 52%;
+  height: 5%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3), transparent 72%);
+  filter: blur(2px);
+  pointer-events: none;
+}
+
 .hero-greeting-canvas {
   width: 100%;
   height: 100%;
   opacity: .96;
+  /* Enable clicks/raycasting on the 3D model (the container stays
+     pointer-events: none so the hero copy still scrolls through freely). */
+  pointer-events: auto;
+  touch-action: pan-y;
+  cursor: default;
 }
 
 .hero-greeting-message {
@@ -775,6 +809,9 @@ main,
   margin: 0 auto;
   padding: 7.5rem 2.5rem 8.5rem;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 @media (min-width: 901px) {
@@ -971,8 +1008,22 @@ main,
   width: 100%;
   padding: 1.5rem 1.5rem;
   margin: 0;
-  background: radial-gradient(ellipse at 50% 50%, rgba(16, 32, 54, 0.4), transparent 75%);
+  background: transparent;
   box-sizing: border-box;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Shared particle background for the skills/expertise sections so the whole
+   page feels like one continuous environment. */
+.section-network-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 @media (min-width: 901px) {
@@ -1124,8 +1175,8 @@ main,
   justify-content: space-between;
   gap: 1.5rem;
   padding: 2rem max(2.5rem, calc((100vw - 1200px) / 2));
-  border-top: 1px solid var(--border-dim);
-  background: var(--footer-bg);
+  border-top: 1px solid transparent;
+  background: transparent;
   color: var(--text-muted);
   font-size: 1rem;
 }
@@ -1509,6 +1560,10 @@ main,
   filter: drop-shadow(0 0 1rem rgba(46, 134, 193, .7)) drop-shadow(0 0 3rem rgba(46, 134, 193, .42));
 }
 
+[data-theme="light"] .hero-three-canvas {
+  filter: drop-shadow(0 0 1rem rgba(0, 0, 139, 0.35)) drop-shadow(0 0 3rem rgba(0, 0, 139, 0.2));
+}
+
 /* Keep the loaded greeting and its synchronised message visible above the decorative layers. */
 .hero-greeting {
   z-index: 2;
@@ -1706,7 +1761,8 @@ html.lenis body {
 
 /* Subtle Floating Code Opacity Fix to avoid text collision */
 .floating-code {
-  opacity: 0.12 !important;
+  color: rgba(93, 230, 255, 0.45);
+  opacity: 0.42 !important;
 }
 
 .marquee-label,
@@ -2073,11 +2129,105 @@ html.lenis body {
 
 .timeline-location {
   display: block;
-  margin-bottom: 1rem;
   color: rgba(194, 198, 214, 0.6);
   font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.02em;
+  transition: opacity 0.25s ease;
+}
+
+.timeline-location-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.timeline-location-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--secondary, #5de6ff);
+  background: rgba(93, 230, 255, 0.08);
+  border: 1px solid rgba(93, 230, 255, 0.25);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: translateY(4px);
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    visibility 0.3s ease;
+}
+
+.timeline-item:hover .timeline-location {
+  opacity: 0;
+}
+
+.timeline-item:hover .timeline-location-btn,
+.timeline-item:focus-within .timeline-location-btn,
+.timeline-location-btn:focus {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.timeline-location-btn:hover {
+  background: rgba(93, 230, 255, 0.2);
+  border-color: rgba(93, 230, 255, 0.65);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(93, 230, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.timeline-location-btn .location-pin-icon {
+  font-size: 0.95rem;
+  color: #5de6ff;
+  transition: transform 0.25s ease;
+}
+
+.timeline-location-btn:hover .location-pin-icon {
+  transform: scale(1.15) translateY(-1px);
+  color: #8befff;
+}
+
+.timeline-location-btn .open-icon {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.timeline-location-btn:hover .open-icon {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+@media (hover: none) {
+  .timeline-location {
+    opacity: 0;
+  }
+
+  .timeline-location-btn {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
 }
 
 .timeline-bullets {
@@ -2449,18 +2599,47 @@ html.lenis body {
   transform: rotate(-90deg) scale(0.5);
 }
 
+/* ─── Animated Theme Transition ─────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-wipe 700ms ease-in-out;
+}
+
+@keyframes theme-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.is-theme-transitioning,
+.is-theme-transitioning *,
+.is-theme-transitioning *::before,
+.is-theme-transitioning *::after {
+  transition: none !important;
+}
+
 /* ─── Light Mode Section Overrides ──────────────────────────── */
 
-/* Particle/immersive section background particle canvas has a dark tint — reduce in light mode */
+/* Particle/immersive section canvas uses black connectors in light mode — keep them clearly visible */
 [data-theme="light"] .immersive-network-canvas,
-[data-theme="light"] .hero-network-canvas {
-  opacity: 0.25;
+[data-theme="light"] .hero-network-canvas,
+[data-theme="light"] .section-network-canvas {
+  opacity: 0.85;
   mix-blend-mode: multiply;
 }
 
 [data-theme="light"] .floating-code {
-  color: rgba(3, 105, 161, 0.18) !important;
-  opacity: 0.15 !important;
+  color: rgba(3, 105, 161, 0.55) !important;
+  opacity: 0.5 !important;
 }
 
 /* Hero section overlay tint for readability in light mode */
@@ -2470,9 +2649,7 @@ html.lenis body {
 }
 
 [data-theme="light"] .immersive-section {
-  background: radial-gradient(circle at top right, rgba(3, 105, 161, 0.06), transparent 35%),
-              radial-gradient(circle at 20% 30%, rgba(3, 105, 161, 0.06), transparent 22%),
-              var(--background);
+  background: var(--background);
 }
 
 /* Hero status pill in light mode */
@@ -2483,7 +2660,7 @@ html.lenis body {
 
 /* Marquee section in light mode */
 [data-theme="light"] .tools-marquee-section {
-  background: radial-gradient(ellipse at 50% 50%, rgba(26, 86, 219, 0.06), transparent 75%);
+  background: transparent;
 }
 
 [data-theme="light"] .marquee-pill:hover {
@@ -2498,8 +2675,19 @@ html.lenis body {
 [data-theme="light"] .experience-card-wrap,
 [data-theme="light"] .profile-card-wrap,
 [data-theme="light"] .glass-panel {
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(26, 86, 219, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(26, 86, 219, 0.16);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(26, 86, 219, 0.1);
+}
+
+/* Panel headings/body are hardcoded white — make them dark so they read on light cards */
+[data-theme="light"] .profile-name-text,
+[data-theme="light"] .timeline-title,
+[data-theme="light"] .timeline-role,
+[data-theme="light"] .education-title,
+[data-theme="light"] .education-degree,
+[data-theme="light"] .philosophy-title {
+  color: #0f172a;
 }
 
 /* Side nav in light mode */
@@ -2515,7 +2703,7 @@ html.lenis body {
 
 /* Footer in light mode */
 [data-theme="light"] .reference-footer {
-  border-top-color: rgba(26, 86, 219, 0.12);
+  border-top-color: transparent;
 }
 
 /* Text shadow for headings — remove dark glow in light mode */
@@ -2525,6 +2713,10 @@ html.lenis body {
 [data-theme="light"] .particle-copy h2,
 [data-theme="light"] .expertise-heading h2 {
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .marquee-label {
+  color: #0f172a;
 }
 
 /* Profile bio + role text in light mode */
@@ -2539,10 +2731,113 @@ html.lenis body {
 
 /* Timeline in light mode */
 [data-theme="light"] .timeline-line {
-  background: rgba(26, 86, 219, 0.12);
+  background: linear-gradient(180deg, rgba(26, 86, 219, 0.6) 0%, rgba(3, 105, 161, 0.5) 100%);
+  opacity: 1;
+}
+
+/* Scroll indicator in light mode */
+[data-theme="light"] .reference-scroll-indicator {
+  color: rgba(26, 86, 219, 0.6);
+}
+
+[data-theme="light"] .reference-scroll-indicator>b {
+  background: linear-gradient(to bottom, rgba(26, 86, 219, 0.55), transparent);
+}
+
+[data-theme="light"] .reference-scroll-indicator>i {
+  border-color: rgba(26, 86, 219, 0.4);
+}
+
+/* Profile tag pills in light mode */
+[data-theme="light"] .profile-tag-chip {
+  background: rgba(26, 86, 219, 0.08);
+  border-color: rgba(26, 86, 219, 0.28);
+  color: #1a56db;
 }
 
 [data-theme="light"] .timeline-date,
 [data-theme="light"] .timeline-location {
   color: rgba(58, 63, 86, 0.6);
+}
+
+[data-theme="light"] .timeline-location-btn {
+  background: rgba(26, 86, 219, 0.08);
+  border-color: rgba(26, 86, 219, 0.28);
+  color: #1a56db;
+}
+
+[data-theme="light"] .timeline-location-btn:hover {
+  background: rgba(26, 86, 219, 0.14);
+  border-color: rgba(26, 86, 219, 0.55);
+  color: #0f2f7a;
+  box-shadow: 0 0 16px rgba(26, 86, 219, 0.25);
+}
+
+[data-theme="light"] .timeline-location-btn .location-pin-icon {
+  color: #1a56db;
+}
+
+[data-theme="light"] .timeline-location-btn:hover .location-pin-icon {
+  color: #0f2f7a;
+}
+
+[data-theme="light"] .timeline-role {
+  color: #111827;
+}
+
+[data-theme="light"] .timeline-bullets li {
+  color: #0f172a;
+}
+
+[data-theme="light"] .education-card-wrap:hover .education-college {
+  color: #3a3f56;
+}
+
+/* ─── Responsive refinements ───────────────────────────────── */
+
+/* Scale the 3D B monogram down on smaller screens so it never
+   overpowers the hero copy (desktop uses transform: scale(1.25)). */
+@media (max-width: 900px) {
+  .hero-three-canvas {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 740px) {
+  .hero-three-canvas {
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 540px) {
+  .hero-three-canvas {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+/* Keep the 3D greeting decorative behind the hero copy on touch
+   screens so the headline and CTAs always stay readable. */
+@media (max-width: 740px) {
+  .hero-greeting {
+    z-index: 1;
+  }
+
+  .reference-hero-content {
+    z-index: 3;
+  }
+}
+
+/* Keep the scroll prompt above the fixed mobile bottom nav. */
+@media (max-width: 900px) {
+  .reference-scroll-indicator {
+    bottom: 5.5rem;
+  }
+}
+
+@media (max-width: 740px) {
+  .reference-scroll-indicator {
+    bottom: 5rem;
+  }
 }

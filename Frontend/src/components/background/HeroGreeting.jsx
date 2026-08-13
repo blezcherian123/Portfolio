@@ -40,8 +40,12 @@ export default function HeroGreeting() {
     let animationFrame
     let disposed = false
     let pointerX = 0
+    let pointerY = 0
+    let headNode = null
     let showTimer
     let hideTimer
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
 
     let bubbleCleanup
 
@@ -78,14 +82,21 @@ export default function HeroGreeting() {
       model = gltf.scene
       const initialBounds = new THREE.Box3().setFromObject(model)
       const initialSize = initialBounds.getSize(new THREE.Vector3())
-      const scale = 6.6 / Math.max(initialSize.x, initialSize.y, initialSize.z)
+      const scale = 6.2 / Math.max(initialSize.x, initialSize.y, initialSize.z)
       model.scale.setScalar(scale)
 
       const scaledBounds = new THREE.Box3().setFromObject(model)
       const center = scaledBounds.getCenter(new THREE.Vector3())
+      const visibleHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
+      const feetY = camera.position.y - visibleHalfHeight + 0.3
       model.position.x = -center.x
-      model.position.y = -scaledBounds.min.y - 3.25
+      model.position.y = -scaledBounds.min.y + feetY
       scene.add(model)
+
+      model.traverse((object) => {
+        if (headNode) return
+        if (object.name.toLowerCase().includes('head')) headNode = object
+      })
 
       if (gltf.animations.length) {
         mixer = new THREE.AnimationMixer(model)
@@ -103,19 +114,55 @@ export default function HeroGreeting() {
       camera.updateProjectionMatrix()
       renderer.setSize(width, height)
     }
-    const handleMouseMove = (event) => {
+    const setPointerFromEvent = (event) => {
       pointerX = (event.clientX / window.innerWidth - 0.5) * 2
+      pointerY = -(event.clientY / window.innerHeight - 0.5) * 2
+    }
+    const updateHover = (event) => {
+      if (!model || disposed) return
+      const rect = renderer.domElement.getBoundingClientRect()
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      raycaster.setFromCamera(pointer, camera)
+      const hits = raycaster.intersectObject(model, true)
+      renderer.domElement.style.cursor = hits.length > 0 ? 'pointer' : 'default'
+    }
+    const handleMouseMove = (event) => {
+      setPointerFromEvent(event)
+      updateHover(event)
+    }
+    const handleClick = (event) => {
+      if (!model || disposed) return
+      const rect = renderer.domElement.getBoundingClientRect()
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      raycaster.setFromCamera(pointer, camera)
+      const hits = raycaster.intersectObject(model, true)
+      if (hits.length === 0) return
+      renderer.domElement.style.cursor = 'pointer'
+      message?.classList.add('is-visible')
+      window.clearTimeout(hideTimer)
+      hideTimer = window.setTimeout(() => message.classList.remove('is-visible'), 2000)
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
     resize()
     window.addEventListener('resize', resize)
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('click', handleClick)
 
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
       const delta = Math.min(clock.getDelta(), 0.04)
       if (shouldAnimate) {
         mixer?.update(delta)
-        if (model) model.rotation.y += (pointerX * 0.18 - model.rotation.y) * 0.025
+        if (model) {
+          model.rotation.y += (pointerX * 0.32 - model.rotation.y) * 0.05
+          model.rotation.x += (pointerY * 0.08 - model.rotation.x) * 0.04
+        }
+        if (headNode) {
+          headNode.rotation.y += (pointerX * 0.28 - headNode.rotation.y) * 0.06
+          headNode.rotation.x += (pointerY * 0.12 - headNode.rotation.x) * 0.06
+        }
       }
       renderer.render(scene, camera)
     }
@@ -128,6 +175,7 @@ export default function HeroGreeting() {
       resetMessageTimers()
       window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('click', handleClick)
       mixer?.stopAllAction()
       model?.traverse((object) => {
         if (!object.isMesh) return
