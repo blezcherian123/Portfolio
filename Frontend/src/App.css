@@ -1420,6 +1420,24 @@ main,
   }
 }
 
+/* Phones: the 3D greeting character only belongs on laptop/iPad widths, so
+   drop it entirely and let the hero copy own the full viewport. */
+@media (max-width: 767.98px) {
+  .hero-greeting {
+    display: none;
+  }
+
+  .reference-hero {
+    padding: 5.5rem 1rem 6rem;
+  }
+
+  .reference-hero-content {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 1rem;
+  }
+}
+
 @media (max-width: 740px) {
   .reference-contact {
     top: 1rem;
