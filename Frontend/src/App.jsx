@@ -9,7 +9,16 @@ import FloatingCodeBackground from './components/background/FloatingCodeBackgrou
 import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
 import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
 import myProfileImage from './assets/my-profile.png'
+import aiDemoVideo from './assets/video_2026-08-11_00-15-32.mp4'
+import mlopsVideo from './assets/video_2026-08-11_00-15-43.mp4'
+import dataEngineeringVideo from './assets/video_2026-08-11_00-16-05.mp4'
+import mlVideo from './assets/doc_2026-08-11_00-16-01.mp4'
+import visionVideo from './assets/doc_2026-08-11_00-15-58.mp4'
+import asyncVideo from './assets/doc_2026-08-11_00-15-49.mp4'
 import ThemeToggler from './components/ThemeToggler'
+import ClickSpark from './components/ClickSpark'
+import TrueFocus from './components/TrueFocus'
+import DecryptedText from './components/DecryptedText'
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -20,12 +29,12 @@ const navItems = [
 ]
 
 const expertiseItems = [
-  { icon: 'neurology', title: 'LLM & Generative AI', description: 'Fine-tuning, retrieval-augmented pipelines, and prompt systems that stay reliable in production.', tags: ['PyTorch', 'LangChain', 'RAG'], tone: 'blue' },
-  { icon: 'videocam', title: 'Computer Vision & Vision AI', description: 'Real-time facial emotion recognition, OpenCV video processing streams, and vision inference models.', tags: ['OpenCV', 'Deep Learning', 'PyTorch'], tone: 'cyan' },
-  { icon: 'query_stats', title: 'Machine Learning', description: 'Predictive models and deep learning systems built on a foundation of clean, well-understood data.', tags: ['TensorFlow', 'scikit-learn', 'Pandas'], tone: 'cyan' },
-  { icon: 'sync_alt', title: 'Async & Distributed Systems', description: 'High-throughput task queues, Celery workers, and Redis caching for distributed asynchronous workloads.', tags: ['Celery', 'Redis', 'FastAPI'], tone: 'violet' },
-  { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Postgres', 'ChromaDB', 'Pinecone'], tone: 'violet' },
-  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'blue' },
+  { icon: 'neurology', title: 'LLM & Generative AI', description: 'Fine-tuning, retrieval-augmented pipelines, and prompt systems that stay reliable in production.', tags: ['PyTorch', 'LangChain', 'RAG'], tone: 'blue', video: aiDemoVideo },
+  { icon: 'videocam', title: 'Computer Vision & Vision AI', description: 'Real-time facial emotion recognition, OpenCV video processing streams, and vision inference models.', tags: ['OpenCV', 'Deep Learning', 'PyTorch'], tone: 'cyan', video: visionVideo },
+  { icon: 'query_stats', title: 'Machine Learning', description: 'Predictive models and deep learning systems built on a foundation of clean, well-understood data.', tags: ['TensorFlow', 'scikit-learn', 'Pandas'], tone: 'cyan', video: mlVideo },
+  { icon: 'sync_alt', title: 'Async & Distributed Systems', description: 'High-throughput task queues, Celery workers, and Redis caching for distributed asynchronous workloads.', tags: ['Celery', 'Redis', 'FastAPI'], tone: 'violet', video: asyncVideo },
+  { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Postgres', 'ChromaDB', 'Pinecone'], tone: 'violet', video: dataEngineeringVideo },
+  { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'blue', video: mlopsVideo },
 ]
 
 const experiences = [
@@ -114,6 +123,86 @@ function RoleCycler({ roles, interval = 2800 }) {
   )
 }
 
+function HeroName() {
+  const [stage, setStage] = useState(0)
+
+  return (
+    <>
+      {stage === 0 && (
+        <DecryptedText
+          text="Blesson C Biju"
+          animateOn="view"
+          sequential
+          revealDirection="start"
+          speed={55}
+          className="hero-name-revealed"
+          encryptedClassName="hero-name-encrypted"
+          onDecryptComplete={() => setStage(1)}
+        />
+      )}
+      {stage === 1 && (
+        <TrueFocus
+          sentence="Blesson C Biju"
+          once
+          blurAmount={4}
+          borderColor="#5de6ff"
+          glowColor="rgba(93, 230, 255, 0.6)"
+          animationDuration={0.5}
+          pauseBetweenAnimations={0.9}
+          onComplete={() => setStage(2)}
+        />
+      )}
+      {stage === 2 && <span className="hero-name-plain">Blesson C Biju</span>}
+    </>
+  )
+}
+
+function ExpertiseCard({ item }) {
+  const [flipped, setFlipped] = useState(false)
+  const toggleFlip = () => setFlipped((f) => !f)
+
+  return (
+    <article
+      className={`expertise-card expertise-card--${item.tone}${flipped ? ' is-flipped' : ''}`}
+      tabIndex={0}
+      onClick={toggleFlip}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          toggleFlip()
+        }
+      }}
+    >
+      <div className="expertise-card-media">
+        <video
+          src={item.video}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-label={`Showcase video for ${item.title}`}
+          ref={(el) => {
+            if (el) el.play().catch(() => {})
+          }}
+        />
+        <div className="expertise-card-media-overlay" aria-hidden="true" />
+      </div>
+      <div className="expertise-card-title">
+        <h3>{item.title}</h3>
+      </div>
+      <div className="expertise-card-back">
+        <div className="expertise-card-back-inner">
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <div className="expertise-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        </div>
+      </div>
+      <span className="expertise-orbit" aria-hidden="true" />
+    </article>
+  )
+}
+
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
   const heroContentRef = useRef(null)
@@ -121,6 +210,18 @@ function App() {
   const detailsRef = useRef(null)
   const expertiseGridRef = useRef(null)
   const experienceGridRef = useRef(null)
+  const lenisRef = useRef(null)
+
+  const scrollToSection = (e, target) => {
+    e.preventDefault()
+    setTimeout(() => {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(target, { duration: 1.2 })
+      } else {
+        document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 420)
+  }
 
   useEffect(() => {
     const onScroll = () => {
@@ -187,7 +288,7 @@ function App() {
         scrollTrigger: { trigger: expertiseGrid, start: 'top 78%', once: true },
       })
       animation
-        .fromTo(cards, { opacity: 0, y: 72, rotateX: -15, scale: 0.92 }, { opacity: 1, y: 0, rotateX: 0, scale: 1, duration: 1.05, stagger: { each: 0.12, from: 'random' }, ease: 'power4.out' })
+        .fromTo(cards, { opacity: 0, y: 72, rotateX: -15, scale: 0.92 }, { opacity: 1, y: 0, rotateX: 0, scale: 1, duration: 1.05, stagger: { each: 0.12, from: 'random' }, ease: 'power4.out', clearProps: 'transform' })
         .fromTo(ornaments, { opacity: 0, scale: 0.35, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 1.2, stagger: 0.08, ease: 'back.out(1.7)' }, 0.2)
     }
 
@@ -237,6 +338,7 @@ function App() {
       smoothWheel: true,
       wheelMultiplier: 1,
     })
+    lenisRef.current = lenis
 
     function raf(time) {
       lenis.raf(time)
@@ -265,7 +367,9 @@ function App() {
 
       <div className="top-nav-bar">
         <ThemeToggler />
-        <a className="reference-contact" href="#contact">Contact</a>
+        <ClickSpark sparkColor="#5de6ff" sparkSize={12} sparkRadius={24} sparkCount={14} duration={450}>
+          <a className="reference-contact" href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a>
+        </ClickSpark>
       </div>
 
       <aside className="reference-side-nav" aria-label="Section navigation">
@@ -307,7 +411,10 @@ function App() {
                 <span aria-hidden="true">Full Stack Developer</span>
               </span>
             </div>
-            <h1 id="hero-title">Blesson C Biju</h1>
+            <h1 id="hero-title">
+              <HeroName />
+              <span className="sr-only">Blesson C Biju</span>
+            </h1>
             {/* <p>Building Intelligent AI Products That Solve Real Problems.</p> */}
             <p className="hero-intro">From first idea to confident launch, I turn complex data and ambitious ideas into dependable, human-centred AI experiences that create measurable momentum.</p>
             <ul className="hero-capabilities" aria-label="Core capabilities">
@@ -317,7 +424,9 @@ function App() {
             </ul>
             <div className="reference-actions">
               <a className="reference-primary-button" href="#projects">View Projects</a>
-              <a className="reference-secondary-button" href="#contact">Contact</a>
+              <ClickSpark sparkColor="#5de6ff" sparkSize={10} sparkRadius={20} sparkCount={12} duration={400}>
+                <a className="reference-secondary-button" href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a>
+              </ClickSpark>
             </div>
           </div>
           <a className="reference-scroll-indicator" href="#work">
@@ -514,13 +623,7 @@ function App() {
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
             {expertiseItems.map((item) => (
-              <article className={`expertise-card expertise-card--${item.tone}`} key={item.title}>
-                <span className="expertise-orbit" aria-hidden="true" />
-                <div className="expertise-icon"><span className="material-symbols-outlined" aria-hidden="true">{item.icon}</span></div>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <div className="expertise-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-              </article>
+              <ExpertiseCard key={item.title} item={item} />
             ))}
           </div>
           <span id="projects" aria-hidden="true" />
