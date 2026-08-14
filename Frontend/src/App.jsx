@@ -19,6 +19,7 @@ import ThemeToggler from './components/ThemeToggler'
 import ClickSpark from './components/ClickSpark'
 import TrueFocus from './components/TrueFocus'
 import DecryptedText from './components/DecryptedText'
+import SplitText from './components/SplitText'
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -262,8 +263,11 @@ function App() {
     }
 
     if (details) {
+      const detailChildren = Array.from(details.children).filter(
+        (child) => !child.classList.contains('expertise-heading'),
+      )
       gsap.fromTo(
-        details.children,
+        detailChildren,
         { opacity: 0, y: 22 },
         {
           opacity: 1,
@@ -279,7 +283,6 @@ function App() {
         },
       )
     }
-
     const expertiseGrid = expertiseGridRef.current
     if (expertiseGrid) {
       const cards = expertiseGrid.querySelectorAll('.expertise-card')
@@ -618,8 +621,34 @@ function App() {
           />
           <p className="section-label section-label--cyan">Expertise</p>
           <div className="expertise-heading">
-            <h2 id="expertise-heading">AI products with a human centre.</h2>
-            <p className="expertise-subheading">From the first spark to a polished release, I create useful digital experiences with care and precision.</p>
+            <SplitText
+              tag="h2"
+              id="expertise-heading"
+              text="AI products with a human centre."
+              className="expertise-heading-title"
+              textAlign="left"
+              delay={70}
+              duration={1.25}
+              ease="power3.out"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+            />
+            <SplitText
+              text="From the first spark to a polished release, I create useful digital experiences with care and precision."
+              className="expertise-subheading"
+              textAlign="left"
+              delay={30}
+              duration={1}
+              ease="power3.out"
+              splitType="words"
+              from={{ opacity: 0, y: 30 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+            />
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
             {expertiseItems.map((item) => (
