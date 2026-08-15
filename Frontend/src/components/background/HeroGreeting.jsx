@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import greetingModelUrl from '../../assets/ImageToStl.com_Standing+Greeting.glb?url'
 
 export default function HeroGreeting() {
@@ -76,36 +77,56 @@ export default function HeroGreeting() {
     }
 
     const loader = new GLTFLoader()
-    loader.load(greetingModelUrl, (gltf) => {
+    loader.setMeshoptDecoder(MeshoptDecoder)
+
+    // The GLB model was ~14MB, so its download is deferred until after the page
+    // has finished loading to avoid competing with the critical render resources.
+    // (It has since been meshopt-compressed to ~2.6MB.)
+    let modelLoadTimer
+    const startModelLoad = () => {
       if (disposed) return
+      loader.load(greetingModelUrl, (gltf) => {
+        if (disposed) return
 
-      model = gltf.scene
-      const initialBounds = new THREE.Box3().setFromObject(model)
-      const initialSize = initialBounds.getSize(new THREE.Vector3())
-      const scale = 6.2 / Math.max(initialSize.x, initialSize.y, initialSize.z)
-      model.scale.setScalar(scale)
+        model = gltf.scene
+        const initialBounds = new THREE.Box3().setFromObject(model)
+        const initialSize = initialBounds.getSize(new THREE.Vector3())
+        const scale = 6.2 / Math.max(initialSize.x, initialSize.y, initialSize.z)
+        model.scale.setScalar(scale)
 
-      const scaledBounds = new THREE.Box3().setFromObject(model)
-      const center = scaledBounds.getCenter(new THREE.Vector3())
-      const visibleHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
-      const feetY = camera.position.y - visibleHalfHeight + 0.3
-      model.position.x = -center.x
-      model.position.y = -scaledBounds.min.y + feetY
-      scene.add(model)
+        const scaledBounds = new THREE.Box3().setFromObject(model)
+        const center = scaledBounds.getCenter(new THREE.Vector3())
+        const visibleHalfHeight = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z
+        const feetY = camera.position.y - visibleHalfHeight + 0.3
+        model.position.x = -center.x
+        model.position.y = -scaledBounds.min.y + feetY
+        scene.add(model)
 
-      model.traverse((object) => {
-        if (headNode) return
-        if (object.name.toLowerCase().includes('head')) headNode = object
+        model.traverse((object) => {
+          if (headNode) return
+          if (object.name.toLowerCase().includes('head')) headNode = object
+        })
+
+        if (gltf.animations.length) {
+          mixer = new THREE.AnimationMixer(model)
+          const greetingClip = gltf.animations[0]
+          mixer.clipAction(greetingClip).play()
+          message?.classList.add('is-synced')
+          bubbleCleanup = showMessageBubble(greetingClip.duration, mixer)
+        }
       })
+    }
 
-      if (gltf.animations.length) {
-        mixer = new THREE.AnimationMixer(model)
-        const greetingClip = gltf.animations[0]
-        mixer.clipAction(greetingClip).play()
-        message?.classList.add('is-synced')
-        bubbleCleanup = showMessageBubble(greetingClip.duration, mixer)
-      }
-    })
+    const beginAfterLoad = () => {
+      if (disposed) return
+      window.clearTimeout(modelLoadTimer)
+      modelLoadTimer = window.setTimeout(startModelLoad, 400)
+    }
+    if (document.readyState === 'complete') {
+      beginAfterLoad()
+    } else {
+      window.addEventListener('load', beginAfterLoad, { once: true })
+    }
 
     const resize = () => {
       const width = container.clientWidth || window.innerWidth
@@ -150,8 +171,19 @@ export default function HeroGreeting() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
     window.addEventListener('click', handleClick)
 
+    // Skip WebGL rendering while the hero is scrolled out of view.
+    let isVisible = true
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries.some((entry) => entry.isIntersecting)
+      },
+      { threshold: 0 },
+    )
+    visibilityObserver.observe(container)
+
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
+      if (!isVisible) return
       const delta = Math.min(clock.getDelta(), 0.04)
       if (shouldAnimate) {
         mixer?.update(delta)
@@ -170,6 +202,8 @@ export default function HeroGreeting() {
 
     return () => {
       disposed = true
+      window.clearTimeout(modelLoadTimer)
+      visibilityObserver.disconnect()
       cancelAnimationFrame(animationFrame)
       bubbleCleanup?.()
       resetMessageTimers()

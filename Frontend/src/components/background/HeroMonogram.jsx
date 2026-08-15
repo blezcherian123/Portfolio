@@ -96,9 +96,20 @@ export default function HeroMonogram() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
     window.addEventListener('resize', resize)
 
+    // Skip WebGL rendering while the hero is scrolled out of view.
+    let isVisible = true
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries.some((entry) => entry.isIntersecting)
+      },
+      { threshold: 0 },
+    )
+    visibilityObserver.observe(container)
+
     let animationFrame
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
+      if (!isVisible) return
       if (!prefersReducedMotion) {
         group.rotation.y += 0.01
         group.rotation.x += 0.005
@@ -112,6 +123,7 @@ export default function HeroMonogram() {
 
     return () => {
       cancelAnimationFrame(animationFrame)
+      visibilityObserver.disconnect()
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', resize)
       bodyGeometry.dispose()

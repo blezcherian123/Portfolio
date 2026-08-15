@@ -1,14 +1,15 @@
 import './App.css'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
-import HeroMonogram from './components/background/HeroMonogram'
-import HeroGreeting from './components/background/HeroGreeting'
-import FloatingCodeBackground from './components/background/FloatingCodeBackground'
-import ParticleNetworkBackground from './components/background/ParticleNetworkBackground'
-import portfolioPencilHolding from './assets/portfolio-pencil-holding.png'
-import myProfileImage from './assets/my-profile.png'
+import LazyAutoplayVideo from './components/LazyAutoplayVideo'
+import ScrollProgressBar from './components/ScrollProgressBar'
+import useNearViewport from './hooks/useNearViewport'
+import portfolioPencilHolding from './assets/portfolio-pencil-holding.webp'
+import portfolioPencilHoldingFallback from './assets/portfolio-pencil-holding.png'
+import myProfileImage from './assets/my-profile.webp'
+import myProfileImageFallback from './assets/my-profile.png'
 import aiDemoVideo from './assets/video_2026-08-11_00-15-32.mp4'
 import mlopsVideo from './assets/video_2026-08-11_00-15-43.mp4'
 import dataEngineeringVideo from './assets/video_2026-08-11_00-16-05.mp4'
@@ -20,6 +21,14 @@ import ClickSpark from './components/ClickSpark'
 import TrueFocus from './components/TrueFocus'
 import DecryptedText from './components/DecryptedText'
 import SplitText from './components/SplitText'
+
+// Three.js is the largest chunk of the JS bundle. Loading these background
+// components lazily keeps three.js out of the initial bundle so the page
+// paints much faster on refresh.
+const FloatingCodeBackground = lazy(() => import('./components/background/FloatingCodeBackground'))
+const HeroMonogram = lazy(() => import('./components/background/HeroMonogram'))
+const HeroGreeting = lazy(() => import('./components/background/HeroGreeting'))
+const ParticleNetworkBackground = lazy(() => import('./components/background/ParticleNetworkBackground'))
 
 const navItems = [
   ['work', 'Experience', 'work'],
@@ -158,15 +167,22 @@ function HeroName() {
   )
 }
 
-function ExpertiseCard({ item }) {
+function ExpertiseCard({ item, index }) {
   const [flipped, setFlipped] = useState(false)
   const toggleFlip = () => setFlipped((f) => !f)
+
+  const handleGlareMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`)
+    event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`)
+  }
 
   return (
     <article
       className={`expertise-card expertise-card--${item.tone}${flipped ? ' is-flipped' : ''}`}
       tabIndex={0}
       onClick={toggleFlip}
+      onMouseMove={handleGlareMove}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
@@ -175,17 +191,10 @@ function ExpertiseCard({ item }) {
       }}
     >
       <div className="expertise-card-media">
-        <video
+        <LazyAutoplayVideo
           src={item.video}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
+          delay={index * 180}
           aria-label={`Showcase video for ${item.title}`}
-          ref={(el) => {
-            if (el) el.play().catch(() => {})
-          }}
         />
         <div className="expertise-card-media-overlay" aria-hidden="true" />
       </div>
@@ -199,6 +208,7 @@ function ExpertiseCard({ item }) {
           <div className="expertise-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </div>
       </div>
+      <span className="expertise-glare" aria-hidden="true" />
       <span className="expertise-orbit" aria-hidden="true" />
     </article>
   )
@@ -206,12 +216,18 @@ function ExpertiseCard({ item }) {
 
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
+  const [activeSection, setActiveSection] = useState('')
   const heroContentRef = useRef(null)
   const heroSectionRef = useRef(null)
-  const detailsRef = useRef(null)
   const expertiseGridRef = useRef(null)
   const experienceGridRef = useRef(null)
   const lenisRef = useRef(null)
+
+  // Defer mounting the below-the-fold WebGL backgrounds until the user gets
+  // close to them, so the initial page only pays for what it can see.
+  const [workSectionRef, mountWorkNetwork] = useNearViewport()
+  const [skillsSectionRef, mountSkillsNetwork] = useNearViewport()
+  const [detailsRef, mountExpertiseNetwork] = useNearViewport()
 
   const scrollToSection = (e, target) => {
     e.preventDefault()
@@ -343,13 +359,6 @@ function App() {
     })
     lenisRef.current = lenis
 
-    function raf(time) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
-
     lenis.on('scroll', ScrollTrigger.update)
 
     gsap.ticker.add((time) => {
@@ -362,11 +371,36 @@ function App() {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
       lenis.destroy()
     }
+  }, [detailsRef])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting)
+        if (!visible.length) return
+        const best = visible.reduce((acc, entry) =>
+          entry.target.getBoundingClientRect().top > acc.target.getBoundingClientRect().top ? entry : acc,
+        )
+        setActiveSection(best.target.id)
+      },
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
+    )
+
+    navItems.forEach(([id]) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
   }, [])
 
   return (
     <div className="portfolio-page">
-      <FloatingCodeBackground />
+      <ScrollProgressBar />
+
+      <Suspense fallback={null}>
+        <FloatingCodeBackground />
+      </Suspense>
 
       <div className="top-nav-bar">
         <ThemeToggler />
@@ -376,8 +410,8 @@ function App() {
       </div>
 
       <aside className="reference-side-nav" aria-label="Section navigation">
-        {navItems.map(([id, label, icon], index) => (
-          <a className={`side-nav-item${index === 0 ? ' is-active' : ''}`} href={`#${id}`} key={id} aria-label={label}>
+        {navItems.map(([id, label, icon]) => (
+          <a className={`side-nav-item${activeSection === id ? ' is-active' : ''}`} href={`#${id}`} key={id} aria-label={label}>
             <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
             <span className="side-nav-tooltip">{label}</span>
           </a>
@@ -387,7 +421,7 @@ function App() {
       {/* Mobile Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
         {navItems.map(([id, label, icon]) => (
-          <a className="mobile-nav-item" href={`#${id}`} key={id}>
+          <a className={`mobile-nav-item${activeSection === id ? ' is-active' : ''}`} href={`#${id}`} key={id}>
             <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
             <span className="mobile-nav-label">{label}</span>
           </a>
@@ -396,16 +430,22 @@ function App() {
 
       <main>
         <section ref={heroSectionRef} className="reference-hero" id="home" aria-labelledby="hero-title">
-          <ParticleNetworkBackground
-            className="hero-network-canvas"
-            pointsCount={180}
-            linkDistance={3.25}
-            color={0x2E86C1}
-            coverage={0.82}
-            showAmbientCloud={false}
-          />
-          <HeroMonogram />
-          <HeroGreeting />
+          <Suspense fallback={null}>
+            <ParticleNetworkBackground
+              className="hero-network-canvas"
+              pointsCount={180}
+              linkDistance={3.25}
+              color={0x2E86C1}
+              coverage={0.82}
+              showAmbientCloud={false}
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <HeroMonogram />
+          </Suspense>
+          <Suspense fallback={null}>
+            <HeroGreeting />
+          </Suspense>
           <div ref={heroContentRef} className="reference-hero-content">
             <div className="hero-status">
               <i aria-hidden="true" />
@@ -439,15 +479,19 @@ function App() {
           </a>
         </section>
 
-        <section className={`particle-section immersive-section phase-${immersivePhase}`} id="work" aria-labelledby="network-heading">
-          <ParticleNetworkBackground
-            className="immersive-network-canvas"
-            pointsCount={100}
-            linkDistance={2.8}
-            color={0x2E86C1}
-            coverage={0.94}
-            showAmbientCloud={false}
-          />
+        <section ref={workSectionRef} className={`particle-section immersive-section phase-${immersivePhase}`} id="work" aria-labelledby="network-heading">
+          {mountWorkNetwork && (
+            <Suspense fallback={null}>
+              <ParticleNetworkBackground
+                className="immersive-network-canvas"
+                pointsCount={100}
+                linkDistance={2.8}
+                color={0x2E86C1}
+                coverage={0.94}
+                showAmbientCloud={false}
+              />
+            </Suspense>
+          )}
           <div className="particle-content">
             <div className="particle-copy">
               <p className="section-label section-label--cyan">Intelligence in motion</p>
@@ -455,7 +499,10 @@ function App() {
               <p>I specialize in developing high-performance AI architectures that transcend traditional computing. My focus lies at the intersection of deep learning and computer vision, creating systems that don't just process data—they understand it.</p>
             </div>
             <div className="particle-illustration">
-              <img src={portfolioPencilHolding} alt="Portfolio illustration featuring pencil with AI concept" />
+              <picture>
+                <source srcSet={portfolioPencilHolding} type="image/webp" />
+                <img src={portfolioPencilHoldingFallback} alt="Portfolio illustration featuring pencil with AI concept" loading="lazy" decoding="async" />
+              </picture>
             </div>
           </div>
 
@@ -464,11 +511,16 @@ function App() {
             <div className="experience-profile-col">
               <div className="glass-panel profile-card-wrap">
                 <div className="profile-image-container">
-                  <img
-                    className="profile-cyber-image"
-                    alt="Blesson C Biju AI Engineer"
-                    src={myProfileImage}
-                  />
+                  <picture>
+                    <source srcSet={myProfileImage} type="image/webp" />
+                    <img
+                      className="profile-cyber-image"
+                      alt="Blesson C Biju AI Engineer"
+                      src={myProfileImageFallback}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                   <div className="profile-image-gradient-overlay" />
                 </div>
                 <div className="profile-identity-content">
@@ -567,15 +619,19 @@ function App() {
           </div>
         </section>
 
-        <section className="tools-marquee-section" id="skills" aria-label="Tools and Technologies">
-          <ParticleNetworkBackground
-            className="section-network-canvas"
-            pointsCount={70}
-            linkDistance={2.8}
-            color={0x2E86C1}
-            coverage={0.9}
-            showAmbientCloud={false}
-          />
+        <section ref={skillsSectionRef} className="tools-marquee-section" id="skills" aria-label="Tools and Technologies">
+          {mountSkillsNetwork && (
+            <Suspense fallback={null}>
+              <ParticleNetworkBackground
+                className="section-network-canvas"
+                pointsCount={70}
+                linkDistance={2.8}
+                color={0x2E86C1}
+                coverage={0.9}
+                showAmbientCloud={false}
+              />
+            </Suspense>
+          )}
           <div className="marquee-header">
             <p className="marquee-label">Tools & Technologies</p>
           </div>
@@ -611,14 +667,18 @@ function App() {
         </div>
 
         <section ref={detailsRef} className="reference-details" id="expertise" aria-labelledby="expertise-heading">
-          <ParticleNetworkBackground
-            className="section-network-canvas"
-            pointsCount={80}
-            linkDistance={2.9}
-            color={0x2E86C1}
-            coverage={0.95}
-            showAmbientCloud={false}
-          />
+          {mountExpertiseNetwork && (
+            <Suspense fallback={null}>
+              <ParticleNetworkBackground
+                className="section-network-canvas"
+                pointsCount={80}
+                linkDistance={2.9}
+                color={0x2E86C1}
+                coverage={0.95}
+                showAmbientCloud={false}
+              />
+            </Suspense>
+          )}
           <p className="section-label section-label--cyan">Expertise</p>
           <div className="expertise-heading">
             <SplitText
@@ -651,8 +711,8 @@ function App() {
             />
           </div>
           <div ref={expertiseGridRef} className="expertise-grid">
-            {expertiseItems.map((item) => (
-              <ExpertiseCard key={item.title} item={item} />
+            {expertiseItems.map((item, idx) => (
+              <ExpertiseCard key={item.title} item={item} index={idx} />
             ))}
           </div>
           <span id="projects" aria-hidden="true" />

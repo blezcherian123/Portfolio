@@ -32,5 +32,14 @@ export default function FloatingCodeBackground() {
     return () => { window.clearInterval(interval); timeouts.forEach(window.clearTimeout) }
   }, [])
 
-  return <div className="site-background" ref={containerRef} aria-hidden="true"><div className="animated-grid" /></div>
+  return (
+    <div className="site-background" ref={containerRef} aria-hidden="true">
+      <div className="animated-grid" />
+      <div className="aurora-blobs">
+        <span className="aurora-blob aurora-blob--1" />
+        <span className="aurora-blob aurora-blob--2" />
+        <span className="aurora-blob aurora-blob--3" />
+      </div>
+    </div>
+  )
 }

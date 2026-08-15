@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,100..700,0..1,0&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
 /* ─── Design Tokens ─────────────────────────────────────────── */
 :root {
   /* Core palette */
@@ -2650,6 +2648,10 @@ html.lenis body {
     color: var(--secondary);
   }
 
+  .mobile-nav-item.is-active {
+    color: var(--secondary);
+  }
+
   .mobile-nav-item .material-symbols-outlined {
     font-size: 1.35rem;
   }
@@ -2999,5 +3001,126 @@ html.lenis body {
 @media (max-width: 740px) {
   .reference-scroll-indicator {
     bottom: 5rem;
+  }
+}
+
+/* ─── Scroll Progress Bar ───────────────────────────────────── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 1000;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  box-shadow: 0 0 12px var(--secondary-glow);
+  pointer-events: none;
+}
+
+/* ─── Aurora Background Blobs ───────────────────────────────── */
+.aurora-blobs {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.aurora-blob--1 {
+  top: -18vw;
+  left: -12vw;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(46, 134, 193, .2), transparent 65%);
+  animation: aurora-drift-1 26s ease-in-out infinite alternate;
+}
+
+.aurora-blob--2 {
+  top: 8vh;
+  right: -14vw;
+  width: 48vw;
+  height: 48vw;
+  background: radial-gradient(circle, rgba(93, 230, 255, .13), transparent 65%);
+  animation: aurora-drift-2 32s ease-in-out infinite alternate;
+}
+
+.aurora-blob--3 {
+  bottom: -16vw;
+  left: 22vw;
+  width: 42vw;
+  height: 42vw;
+  background: radial-gradient(circle, rgba(167, 139, 250, .12), transparent 65%);
+  animation: aurora-drift-3 38s ease-in-out infinite alternate;
+}
+
+[data-theme="light"] .aurora-blob--1 {
+  background: radial-gradient(circle, rgba(26, 86, 219, .12), transparent 65%);
+}
+
+[data-theme="light"] .aurora-blob--2 {
+  background: radial-gradient(circle, rgba(3, 105, 161, .1), transparent 65%);
+}
+
+[data-theme="light"] .aurora-blob--3 {
+  background: radial-gradient(circle, rgba(124, 58, 237, .08), transparent 65%);
+}
+
+@keyframes aurora-drift-1 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(6vw, 4vh, 0) scale(1.15);
+  }
+}
+
+@keyframes aurora-drift-2 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  to {
+    transform: translate3d(-5vw, -3vh, 0) scale(1);
+  }
+}
+
+@keyframes aurora-drift-3 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4vw, -5vh, 0) scale(1.12);
+  }
+}
+
+/* ─── Expertise Card Glare ──────────────────────────────────── */
+.expertise-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .45s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .16), transparent 46%);
+  pointer-events: none;
+}
+
+.expertise-card:hover .expertise-glare {
+  opacity: 1;
+}
+
+[data-theme="light"] .expertise-glare {
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .55), transparent 46%);
+}
+
+/* ─── Reduced Motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob {
+    animation: none;
   }
 }

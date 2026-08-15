@@ -160,11 +160,23 @@ export default function ParticleNetworkBackground({
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(container)
 
+    // Skip all per-frame WebGL work while the section is off-screen so the
+    // page only spends GPU/CPU time rendering what the user can actually see.
+    let isVisible = true
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries.some((entry) => entry.isIntersecting)
+      },
+      { threshold: 0 },
+    )
+    visibilityObserver.observe(container)
+
     const clock = new THREE.Clock()
     let animationFrame
     let frameCount = 0
     const animate = () => {
       animationFrame = requestAnimationFrame(animate)
+      if (!isVisible) return
       const delta = Math.min(clock.getDelta(), 0.04)
       const liveBounds = getBounds()
       for (let index = 0; index < nodeCount; index += 1) {
@@ -195,6 +207,7 @@ export default function ParticleNetworkBackground({
 
     return () => {
       cancelAnimationFrame(animationFrame)
+      visibilityObserver.disconnect()
       themeObserver.disconnect()
       resizeObserver.disconnect()
       window.removeEventListener('mousemove', handleMouseMove)
