@@ -31,11 +31,11 @@ const HeroGreeting = lazy(() => import('./components/background/HeroGreeting'))
 const ParticleNetworkBackground = lazy(() => import('./components/background/ParticleNetworkBackground'))
 
 const navItems = [
-  ['work', 'Experience', 'work'],
-  ['skills', 'Skills', 'code'],
-  ['expertise', 'Expertise', 'bolt'],
-  ['projects', 'Projects', 'folder_special'],
-  ['workflow', 'Workflow', 'account_tree'],
+  ['work', 'Experience', 'work', 'experience'],
+  ['skills', 'Skills', 'code', 'skills'],
+  ['expertise', 'Expertise', 'bolt', 'expertise'],
+  ['projects', 'Projects', 'folder_special', 'projects'],
+  ['workflow', 'Workflow', 'account_tree', 'workflow'],
 ]
 
 const expertiseItems = [
@@ -214,6 +214,29 @@ function ExpertiseCard({ item, index }) {
   )
 }
 
+function SmoothLink({ to, onNavigate, className = '', children, ...rest }) {
+  const handleClick = (e) => {
+    if (to) onNavigate(e, to)
+  }
+  return (
+    <a
+      className={className}
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleClick(e)
+        }
+      }}
+      {...rest}
+    >
+      {children}
+    </a>
+  )
+}
+
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
   const [activeSection, setActiveSection] = useState('')
@@ -229,15 +252,26 @@ function App() {
   const [skillsSectionRef, mountSkillsNetwork] = useNearViewport()
   const [detailsRef, mountExpertiseNetwork] = useNearViewport()
 
-  const scrollToSection = (e, target) => {
+  const scrollToSection = (e, targetId) => {
     e.preventDefault()
     setTimeout(() => {
+      const el = targetId ? document.getElementById(targetId) : null
+      if (!el) return
       if (lenisRef.current) {
-        lenisRef.current.scrollTo(target, { duration: 1.2 })
+        lenisRef.current.scrollTo(el, { duration: 1.2 })
       } else {
-        document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+        el.scrollIntoView({ behavior: 'smooth' })
       }
     }, 420)
+  }
+
+  const scrollToTop = (e) => {
+    e.preventDefault()
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 1.2 })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   useEffect(() => {
@@ -405,26 +439,26 @@ function App() {
       <div className="top-nav-bar">
         <ThemeToggler />
         <ClickSpark sparkColor="#5de6ff" sparkSize={12} sparkRadius={24} sparkCount={14} duration={450}>
-          <a className="reference-contact" href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a>
+          <SmoothLink to="contact" onNavigate={scrollToSection} className="reference-contact">Contact</SmoothLink>
         </ClickSpark>
       </div>
 
       <aside className="reference-side-nav" aria-label="Section navigation">
-        {navItems.map(([id, label, icon]) => (
-          <a className={`side-nav-item${activeSection === id ? ' is-active' : ''}`} href={`#${id}`} key={id} aria-label={label}>
+        {navItems.map(([id, label, icon, target]) => (
+          <SmoothLink to={target} onNavigate={scrollToSection} className={`side-nav-item${activeSection === id ? ' is-active' : ''}`} key={id} aria-label={label}>
             <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
             <span className="side-nav-tooltip">{label}</span>
-          </a>
+          </SmoothLink>
         ))}
       </aside>
 
       {/* Mobile Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
-        {navItems.map(([id, label, icon]) => (
-          <a className={`mobile-nav-item${activeSection === id ? ' is-active' : ''}`} href={`#${id}`} key={id}>
+        {navItems.map(([id, label, icon, target]) => (
+          <SmoothLink to={target} onNavigate={scrollToSection} className={`mobile-nav-item${activeSection === id ? ' is-active' : ''}`} key={id}>
             <span className="material-symbols-outlined" aria-hidden="true">{icon}</span>
             <span className="mobile-nav-label">{label}</span>
-          </a>
+          </SmoothLink>
         ))}
       </nav>
 
@@ -466,17 +500,17 @@ function App() {
               <li>Production-ready Systems</li>
             </ul>
             <div className="reference-actions">
-              <a className="reference-primary-button" href="#projects">View Projects</a>
+              <SmoothLink to="projects" onNavigate={scrollToSection} className="reference-primary-button">View Projects</SmoothLink>
               <ClickSpark sparkColor="#5de6ff" sparkSize={10} sparkRadius={20} sparkCount={12} duration={400}>
-                <a className="reference-secondary-button" href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a>
+                <SmoothLink to="contact" onNavigate={scrollToSection} className="reference-secondary-button">Contact</SmoothLink>
               </ClickSpark>
             </div>
           </div>
-          <a className="reference-scroll-indicator" href="#work">
+          <SmoothLink to="work" onNavigate={scrollToSection} className="reference-scroll-indicator">
             <span>Scroll To Explore</span>
             <b aria-hidden="true" />
             <i aria-hidden="true"><em /></i>
-          </a>
+          </SmoothLink>
         </section>
 
         <section ref={workSectionRef} className={`particle-section immersive-section phase-${immersivePhase}`} id="work" aria-labelledby="network-heading">
@@ -506,7 +540,7 @@ function App() {
             </div>
           </div>
 
-          <div className="experience-grid-layout" ref={experienceGridRef}>
+          <div className="experience-grid-layout" id="experience" ref={experienceGridRef}>
             {/* Left Column: About/Profile Card */}
             <div className="experience-profile-col">
               <div className="glass-panel profile-card-wrap">
@@ -721,9 +755,43 @@ function App() {
       </main>
 
       <footer className="reference-footer" id="contact">
-        <span>B.</span>
-        <span>(c) 2026 AI Engineering Portfolio</span>
-        <div><a href="#github">GitHub</a><a href="#linkedin">LinkedIn</a><a href="#twitter">Twitter</a></div>
+        <div className="footer-aurora" aria-hidden="true" />
+
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <p className="footer-tagline">
+              From first idea to confident launch — building dependable, human-centred AI experiences that create measurable momentum.
+            </p>
+            <div className="footer-socials">
+              <a className="footer-social-link" aria-label="GitHub">GitHub</a>
+              <a className="footer-social-link" aria-label="LinkedIn">LinkedIn</a>
+              <a className="footer-social-link" aria-label="Twitter">Twitter</a>
+            </div>
+          </div>
+
+          <nav className="footer-col" aria-label="Footer navigation">
+            <h4 className="footer-col-title">Navigate</h4>
+            <SmoothLink to="experience" onNavigate={scrollToSection} className="footer-link">Experience</SmoothLink>
+            <SmoothLink to="skills" onNavigate={scrollToSection} className="footer-link">Skills</SmoothLink>
+            <SmoothLink to="expertise" onNavigate={scrollToSection} className="footer-link">Expertise</SmoothLink>
+            <SmoothLink to="projects" onNavigate={scrollToSection} className="footer-link">Projects</SmoothLink>
+            <SmoothLink to="workflow" onNavigate={scrollToSection} className="footer-link">Workflow</SmoothLink>
+          </nav>
+
+          <div className="footer-col">
+            <h4 className="footer-col-title">Contact</h4>
+            <p className="footer-col-text">Open to collaborations and AI engineering opportunities.</p>
+            <SmoothLink to="contact" onNavigate={scrollToSection} className="footer-cta">Get In Touch</SmoothLink>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span aria-hidden="true" />
+          <span className="footer-copyright">(c) 2026 Blesson C Biju — AI Engineering Portfolio</span>
+          <button type="button" className="footer-top-btn" onClick={scrollToTop} aria-label="Back to top">
+            <span className="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
+          </button>
+        </div>
       </footer>
     </div>
   )
