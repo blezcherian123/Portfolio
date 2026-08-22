@@ -3,7 +3,6 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
-import LazyAutoplayVideo from './components/LazyAutoplayVideo'
 import ScrollProgressBar from './components/ScrollProgressBar'
 import useNearViewport from './hooks/useNearViewport'
 import portfolioPencilHolding from './assets/portfolio-pencil-holding.webp'
@@ -21,6 +20,7 @@ import ClickSpark from './components/ClickSpark'
 import TrueFocus from './components/TrueFocus'
 import DecryptedText from './components/DecryptedText'
 import SplitText from './components/SplitText'
+import AccordionGallery from './components/AccordionGallery'
 
 // Three.js is the largest chunk of the JS bundle. Loading these background
 // components lazily keeps three.js out of the initial bundle so the page
@@ -46,6 +46,13 @@ const expertiseItems = [
   { icon: 'database', title: 'Data Engineering', description: 'Pipelines and vector stores that keep models fed with data they can actually trust.', tags: ['Postgres', 'ChromaDB', 'Pinecone'], tone: 'violet', video: dataEngineeringVideo },
   { icon: 'deployed_code', title: 'MLOps & Deployment', description: "Serving, monitoring, and CI/CD so a model's behaviour in production matches what shipped.", tags: ['AWS', 'Docker', 'EC2'], tone: 'blue', video: mlopsVideo },
 ]
+
+const expertiseGalleryItems = expertiseItems.map(({ title, description, tags, video }) => ({
+  label: title,
+  description,
+  tags,
+  video,
+}))
 
 const experiences = [
   {
@@ -167,53 +174,6 @@ function HeroName() {
   )
 }
 
-function ExpertiseCard({ item, index }) {
-  const [flipped, setFlipped] = useState(false)
-  const toggleFlip = () => setFlipped((f) => !f)
-
-  const handleGlareMove = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    event.currentTarget.style.setProperty('--mx', `${event.clientX - rect.left}px`)
-    event.currentTarget.style.setProperty('--my', `${event.clientY - rect.top}px`)
-  }
-
-  return (
-    <article
-      className={`expertise-card expertise-card--${item.tone}${flipped ? ' is-flipped' : ''}`}
-      tabIndex={0}
-      onClick={toggleFlip}
-      onMouseMove={handleGlareMove}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          toggleFlip()
-        }
-      }}
-    >
-      <div className="expertise-card-media">
-        <LazyAutoplayVideo
-          src={item.video}
-          delay={index * 180}
-          aria-label={`Showcase video for ${item.title}`}
-        />
-        <div className="expertise-card-media-overlay" aria-hidden="true" />
-      </div>
-      <div className="expertise-card-title">
-        <h3>{item.title}</h3>
-      </div>
-      <div className="expertise-card-back">
-        <div className="expertise-card-back-inner">
-          <h3>{item.title}</h3>
-          <p>{item.description}</p>
-          <div className="expertise-tags">{item.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-        </div>
-      </div>
-      <span className="expertise-glare" aria-hidden="true" />
-      <span className="expertise-orbit" aria-hidden="true" />
-    </article>
-  )
-}
-
 function SmoothLink({ to, onNavigate, className = '', children, ...rest }) {
   const handleClick = (e) => {
     if (to) onNavigate(e, to)
@@ -242,7 +202,6 @@ function App() {
   const [activeSection, setActiveSection] = useState('')
   const heroContentRef = useRef(null)
   const heroSectionRef = useRef(null)
-  const expertiseGridRef = useRef(null)
   const experienceGridRef = useRef(null)
   const lenisRef = useRef(null)
 
@@ -332,17 +291,6 @@ function App() {
           },
         },
       )
-    }
-    const expertiseGrid = expertiseGridRef.current
-    if (expertiseGrid) {
-      const cards = expertiseGrid.querySelectorAll('.expertise-card')
-      const ornaments = expertiseGrid.querySelectorAll('.expertise-orbit')
-      const animation = gsap.timeline({
-        scrollTrigger: { trigger: expertiseGrid, start: 'top 78%', once: true },
-      })
-      animation
-        .fromTo(cards, { opacity: 0, y: 72, rotateX: -15, scale: 0.92 }, { opacity: 1, y: 0, rotateX: 0, scale: 1, duration: 1.05, stagger: { each: 0.12, from: 'random' }, ease: 'power4.out', clearProps: 'transform' })
-        .fromTo(ornaments, { opacity: 0, scale: 0.35, rotation: -90 }, { opacity: 1, scale: 1, rotation: 0, duration: 1.2, stagger: 0.08, ease: 'back.out(1.7)' }, 0.2)
     }
 
     // Timeline items scroll-in animation via IntersectionObserver
@@ -704,11 +652,11 @@ function App() {
           {mountExpertiseNetwork && (
             <Suspense fallback={null}>
               <ParticleNetworkBackground
-                className="section-network-canvas"
-                pointsCount={80}
-                linkDistance={2.9}
+                className="expertise-network-canvas"
+                pointsCount={120}
+                linkDistance={3.0}
                 color={0x2E86C1}
-                coverage={0.95}
+                coverage={0.85}
                 showAmbientCloud={false}
               />
             </Suspense>
@@ -744,11 +692,28 @@ function App() {
               rootMargin="-100px"
             />
           </div>
-          <div ref={expertiseGridRef} className="expertise-grid">
-            {expertiseItems.map((item, idx) => (
-              <ExpertiseCard key={item.title} item={item} index={idx} />
-            ))}
-          </div>
+
+          <AccordionGallery
+            items={expertiseGalleryItems}
+            defaultIndex={0}
+            expandRatio={0.52}
+            trigger="hover"
+            accentColor="#5DE6FF"
+            overlayColor="#060010"
+            textColor="#ffffff"
+            grayscale
+            showLabels
+            duration={0.6}
+            ease="power3.out"
+            parallax={0.5}
+            tilt={8}
+            stagger={0.06}
+            height={460}
+            gap={10}
+            radius={16}
+            orientation="horizontal"
+          />
+
           <span id="projects" aria-hidden="true" />
           <span className="workflow-anchor" id="workflow" aria-hidden="true" />
         </section>
