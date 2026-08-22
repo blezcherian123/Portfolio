@@ -55,8 +55,9 @@ const AccordionGallery = ({
   const prevActiveRef = useRef(null);
 
   const syncPlayback = useCallback(() => {
-    mediaRefs.current.forEach((media, i) => {
-      if (!media || media.tagName !== 'VIDEO') return;
+    mediaRefs.current.forEach((el, i) => {
+      const media = el?.tagName === 'VIDEO' ? el : el?.querySelector('video');
+      if (!media) return;
       if (inViewRef.current && i === activeRef.current) {
         if (prevActiveRef.current !== i && media.readyState >= 1) {
           media.currentTime = 0;
