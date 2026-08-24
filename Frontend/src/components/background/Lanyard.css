@@ -1,0 +1,90 @@
+.lanyard-root {
+  pointer-events: none;
+}
+
+.lanyard-wrapper {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lanyard-wrapper canvas {
+  pointer-events: auto;
+  /* Vertical swipes keep scrolling the page; horizontal drags swing the card. */
+  touch-action: pan-y;
+}
+
+.lanyard-message {
+  position: absolute;
+  top: 28%;
+  right: 0;
+  max-width: 13rem;
+  margin: 0;
+  padding: .7rem 1rem;
+  border: 1px solid rgba(93, 230, 255, .35);
+  border-radius: 1rem 1rem .2rem 1rem;
+  background: var(--glass-bg);
+  box-shadow: 0 .6rem 2rem rgba(0, 0, 0, .22);
+  color: var(--on-surface);
+  font: 500 clamp(.8rem, 1.2vw, 1rem)/1.35 'Space Grotesk', sans-serif;
+  opacity: 0;
+  transform: translate(-1.25rem, .5rem);
+  transition: opacity .25s ease, transform .25s ease;
+  backdrop-filter: blur(10px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lanyard-message.is-visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Hero placement — mirrors the slot the old greeting model occupied. */
+.lanyard-root.hero-lanyard {
+  position: absolute;
+  right: 1rem;
+  bottom: 0;
+  z-index: 2;
+  width: min(48vw, 620px);
+  height: min(88%, 760px);
+}
+
+@media (max-width: 1100px) {
+  .lanyard-root.hero-lanyard {
+    right: 0;
+    width: min(42vw, 480px);
+    height: min(78%, 640px);
+  }
+}
+
+@media (max-width: 900px) {
+  .lanyard-root.hero-lanyard {
+    right: -1.5rem;
+    width: min(54vw, 420px);
+    height: min(70%, 560px);
+  }
+}
+
+@media (max-width: 740px) {
+  .lanyard-root.hero-lanyard {
+    right: -2rem;
+    width: 92vw;
+    height: 58%;
+    /* Keep the badge behind the hero copy on small screens so the headline
+       and CTAs always stay readable. */
+    z-index: 1;
+  }
+
+  .lanyard-message {
+    top: 12%;
+    right: 5.5rem;
+    max-width: 9rem;
+    font-size: .72rem;
+    padding: .65rem .85rem;
+  }
+}

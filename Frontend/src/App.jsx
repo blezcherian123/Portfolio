@@ -9,6 +9,7 @@ import portfolioPencilHolding from './assets/portfolio-pencil-holding.webp'
 import portfolioPencilHoldingFallback from './assets/portfolio-pencil-holding.png'
 import myProfileImage from './assets/my-profile.webp'
 import myProfileImageFallback from './assets/my-profile.png'
+import cardLogoImage from './assets/lanyard/card-logo.png'
 import aiDemoVideo from './assets/video_2026-08-11_00-15-32.mp4'
 import mlopsVideo from './assets/video_2026-08-11_00-15-43.mp4'
 import dataEngineeringVideo from './assets/video_2026-08-11_00-16-05.mp4'
@@ -27,7 +28,7 @@ import AccordionGallery from './components/AccordionGallery'
 // paints much faster on refresh.
 const FloatingCodeBackground = lazy(() => import('./components/background/FloatingCodeBackground'))
 const HeroMonogram = lazy(() => import('./components/background/HeroMonogram'))
-const HeroGreeting = lazy(() => import('./components/background/HeroGreeting'))
+const Lanyard = lazy(() => import('./components/background/Lanyard'))
 const ParticleNetworkBackground = lazy(() => import('./components/background/ParticleNetworkBackground'))
 
 const navItems = [
@@ -233,6 +234,18 @@ function App() {
     }
   }
 
+  // Tapping/swiping the hero lanyard badge routes visitors to the contact
+  // section (same behaviour the old greeting character had on click).
+  const scrollToContactFromLanyard = () => {
+    const el = document.getElementById('contact')
+    if (!el) return
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(el, { duration: 1.2 })
+    } else {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   useEffect(() => {
     const onScroll = () => {
       const section = document.getElementById('work')
@@ -426,7 +439,13 @@ function App() {
             <HeroMonogram />
           </Suspense>
           <Suspense fallback={null}>
-            <HeroGreeting />
+            <Lanyard
+              className="hero-lanyard"
+              frontImage={myProfileImage}
+              backImage={cardLogoImage}
+              imageFit="cover"
+              onCardClick={scrollToContactFromLanyard}
+            />
           </Suspense>
           <div ref={heroContentRef} className="reference-hero-content">
             <div className="hero-status">
