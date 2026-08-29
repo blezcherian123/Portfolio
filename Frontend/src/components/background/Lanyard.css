@@ -18,37 +18,16 @@
   touch-action: pan-y;
 }
 
-/* Hero placement — ID card sits on the right of the hero (original position). */
+/* Hero placement — the render layer covers the whole hero so the card can be
+   dragged anywhere within it without being hidden or clipped by other divs.
+   It lives inside the hero (absolute) so it scrolls away with the page, and
+   sits on top of every other hero element via a high z-index. */
 .lanyard-root.hero-lanyard {
   position: absolute;
-  right: 1rem;
-  top: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 2000;
-  width: min(48vw, 620px);
-  height: min(88%, 760px);
-}
-
-@media (max-width: 1100px) {
-  .lanyard-root.hero-lanyard {
-    right: 0;
-    width: min(42vw, 480px);
-    height: min(78%, 640px);
-  }
-}
-
-@media (max-width: 900px) {
-  .lanyard-root.hero-lanyard {
-    right: -1.5rem;
-    width: min(54vw, 420px);
-    height: min(70%, 560px);
-  }
-}
-
-@media (max-width: 740px) {
-  .lanyard-root.hero-lanyard {
-    right: -2rem;
-    width: 92vw;
-    height: 58%;
-    z-index: 2000;
-  }
+  pointer-events: none;
+  overflow: visible;
 }

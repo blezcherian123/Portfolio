@@ -38,7 +38,7 @@ export default function Lanyard({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
-  lanyardWidth = 2,
+  lanyardWidth = 1.0,
   onCardClick = null,
   className = '',
 }) {
@@ -277,7 +277,7 @@ function Band({
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 2.74, 0]
+    [0, 2.556, -0.05]
   ]);
 
   useEffect(() => {
@@ -310,7 +310,7 @@ function Band({
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
-      band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
+      band.current.geometry.setPoints(curve.getPoints(isMobile ? 24 : 48));
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
@@ -336,7 +336,7 @@ function Band({
 
   return (
     <>
-      <group position={[0, 4, 0]}>
+      <group position={[3.8, 4.6, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
@@ -350,7 +350,7 @@ function Band({
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[1.1, 1.6, 0.03]} />
           <group
-            scale={[3.06, 3.2, 2.25]}
+            scale={[3.04, 3.2, 2.25]}
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
@@ -376,7 +376,6 @@ function Band({
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
-          depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           useMap
           map={texture}
