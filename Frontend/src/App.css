@@ -3213,3 +3213,36 @@ html.lenis body {
 .footer-social-link {
   cursor: pointer;
 }
+
+/* ─── Swarm cursor toggle ─────────────────────────────────── */
+.swarm-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--secondary);
+  background: radial-gradient(circle at 30% 30%, var(--secondary), var(--primary));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--secondary) 70%, transparent);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.swarm-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--secondary) 90%, transparent);
+}
+
+.swarm-toggle:active {
+  transform: scale(0.92);
+}
+
+.swarm-toggle.is-off {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--secondary) 45%, transparent);
+  box-shadow: none;
+  filter: grayscale(0.6);
+}

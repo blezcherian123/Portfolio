@@ -18,6 +18,7 @@ import visionVideo from './assets/doc_2026-08-11_00-15-58.mp4'
 import asyncVideo from './assets/doc_2026-08-11_00-15-49.mp4'
 import ThemeToggler from './components/ThemeToggler'
 import ClickSpark from './components/ClickSpark'
+import SwarmCursor from './components/SwarmCursor'
 import TrueFocus from './components/TrueFocus'
 import DecryptedText from './components/DecryptedText'
 import SplitText from './components/SplitText'
@@ -201,6 +202,7 @@ function SmoothLink({ to, onNavigate, className = '', children, ...rest }) {
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
   const [activeSection, setActiveSection] = useState('')
+  const [swarmEnabled, setSwarmEnabled] = useState(true)
   const heroContentRef = useRef(null)
   const heroSectionRef = useRef(null)
   const experienceGridRef = useRef(null)
@@ -390,8 +392,9 @@ function App() {
   }, [])
 
   return (
-    <div className="portfolio-page">
-      <ScrollProgressBar />
+      <div className="portfolio-page">
+        <ScrollProgressBar />
+        {swarmEnabled && <SwarmCursor overlay color="#5de6ff" accentColor="#adc6ff" count={12} size={6} speed={2.5} spread={110} wander={0.25} trail={0.75} scatterOnClick /> }
 
       <Suspense fallback={null}>
         <FloatingCodeBackground />
@@ -402,6 +405,14 @@ function App() {
         <ClickSpark sparkColor="#5de6ff" sparkSize={12} sparkRadius={24} sparkCount={14} duration={450}>
           <SmoothLink to="contact" onNavigate={scrollToSection} className="reference-contact">Contact</SmoothLink>
         </ClickSpark>
+        <button
+          type="button"
+          className={`swarm-toggle${swarmEnabled ? '' : ' is-off'}`}
+          onClick={() => setSwarmEnabled(v => !v)}
+          aria-pressed={swarmEnabled}
+          aria-label="Toggle swarm cursor"
+          title={swarmEnabled ? 'Swarm cursor: on' : 'Swarm cursor: off'}
+        />
       </div>
 
       <aside className="reference-side-nav" aria-label="Section navigation">
