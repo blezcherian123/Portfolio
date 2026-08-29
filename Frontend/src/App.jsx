@@ -34,6 +34,7 @@ const ParticleNetworkBackground = lazy(() => import('./components/background/Par
 const SwarmCursor = lazy(() => import('./components/SwarmCursor'))
 const SplitText = lazy(() => import('./components/SplitText'))
 const AccordionGallery = lazy(() => import('./components/AccordionGallery'))
+const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
 const navItems = [
   ['work', 'Experience', 'work', 'experience'],
@@ -445,7 +446,6 @@ function App() {
         ))}
       </aside>
 
-      {/* Mobile Bottom Navigation Bar */}
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
         {navItems.map(([id, label, icon, target]) => (
           <SmoothLink to={target} onNavigate={scrollToSection} className={`mobile-nav-item${activeSection === id ? ' is-active' : ''}`} key={id}>
@@ -454,6 +454,10 @@ function App() {
           </SmoothLink>
         ))}
       </nav>
+
+      <Suspense fallback={null}>
+        <AiAssistant />
+      </Suspense>
 
       <main>
         <section ref={heroSectionRef} className="reference-hero" id="home" aria-labelledby="hero-title">
