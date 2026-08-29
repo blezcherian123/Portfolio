@@ -338,6 +338,10 @@ function Band({
     <>
       <group position={[3.8, 4.6, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
+        <mesh position={[0, 0, 0]}>
+          <torusGeometry args={[0.15, 0.045, 16, 40]} />
+          <primitive object={materials.metal} attach="material" />
+        </mesh>
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
