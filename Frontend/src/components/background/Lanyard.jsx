@@ -38,8 +38,7 @@ export default function Lanyard({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
-  lanyardWidth = 1,
-  message = 'Hii, nice to meet you! 👋',
+  lanyardWidth = 2,
   onCardClick = null,
   className = '',
 }) {
@@ -48,9 +47,6 @@ export default function Lanyard({
   // loading to avoid competing with the critical render resources.
   const [ready, setReady] = useState(false)
   const wrapperRef = useRef(null)
-  const [hoveredCard, setHoveredCard] = useState(false)
-  const [flashMessage, setFlashMessage] = useState(false)
-  const flashTimer = useRef(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -74,8 +70,6 @@ export default function Lanyard({
     }
   }, [])
 
-  useEffect(() => () => window.clearTimeout(flashTimer.current), [])
-
   useEffect(() => {
     if (frontImage) useTexture.preload(frontImage)
     if (backImage) useTexture.preload(backImage)
@@ -83,13 +77,8 @@ export default function Lanyard({
   }, [frontImage, backImage, lanyardImage])
 
   const handleCardClick = () => {
-    setFlashMessage(true)
-    window.clearTimeout(flashTimer.current)
-    flashTimer.current = window.setTimeout(() => setFlashMessage(false), 2200)
     onCardClick?.()
   }
-
-  const messageVisible = hoveredCard || flashMessage
 
   return (
     <div className={`lanyard-root${className ? ` ${className}` : ''}`}>
@@ -114,7 +103,6 @@ export default function Lanyard({
                     imageFit={imageFit}
                     lanyardImage={lanyardImage}
                     lanyardWidth={lanyardWidth}
-                    onHoverChange={setHoveredCard}
                     onActivate={handleCardClick}
                   />
                 </PointerSway>
@@ -153,7 +141,6 @@ export default function Lanyard({
           </Suspense>
         )}
       </div>
-      <p className={`lanyard-message${messageVisible ? ' is-visible' : ''}`} aria-hidden="true">{message}</p>
     </div>
   )
 }
@@ -194,7 +181,6 @@ function Band({
   imageFit = 'cover',
   lanyardImage = null,
   lanyardWidth = 1,
-  onHoverChange = null,
   onActivate = null,
 }) {
   const band = useRef(),
@@ -291,7 +277,7 @@ function Band({
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.5, 0]
+    [0, 2.74, 0]
   ]);
 
   useEffect(() => {
@@ -303,7 +289,9 @@ function Band({
 
   useFrame((state, delta) => {
     if (dragged) {
-      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
+      const px = THREE.MathUtils.clamp(state.pointer.x, -0.88, 0.88);
+      const py = THREE.MathUtils.clamp(state.pointer.y, -0.88, 0.88);
+      vec.set(px, py, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
       [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
@@ -360,12 +348,12 @@ function Band({
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+          <CuboidCollider args={[1.1, 1.6, 0.03]} />
           <group
-            scale={2.25}
+            scale={[3.06, 3.2, 2.25]}
             position={[0, -1.2, -0.05]}
-            onPointerOver={() => (hover(true), onHoverChange?.(true))}
-            onPointerOut={() => (hover(false), onHoverChange?.(false))}
+            onPointerOver={() => hover(true)}
+            onPointerOut={() => hover(false)}
             onPointerUp={handlePointerUp}
             onPointerDown={handlePointerDown}
           >
