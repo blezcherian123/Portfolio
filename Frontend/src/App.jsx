@@ -18,11 +18,8 @@ import visionVideo from './assets/doc_2026-08-11_00-15-58.mp4'
 import asyncVideo from './assets/doc_2026-08-11_00-15-49.mp4'
 import ThemeToggler from './components/ThemeToggler'
 import ClickSpark from './components/ClickSpark'
-import SwarmCursor from './components/SwarmCursor'
 import TrueFocus from './components/TrueFocus'
 import DecryptedText from './components/DecryptedText'
-import SplitText from './components/SplitText'
-import AccordionGallery from './components/AccordionGallery'
 
 // Three.js is the largest chunk of the JS bundle. Loading these background
 // components lazily keeps three.js out of the initial bundle so the page
@@ -31,6 +28,12 @@ const FloatingCodeBackground = lazy(() => import('./components/background/Floati
 const HeroMonogram = lazy(() => import('./components/background/HeroMonogram'))
 const Lanyard = lazy(() => import('./components/background/Lanyard'))
 const ParticleNetworkBackground = lazy(() => import('./components/background/ParticleNetworkBackground'))
+
+// Below-the-fold and decorative components are also loaded lazily so the OGL
+// cursor renderer and the expertise section code never block the hero paint.
+const SwarmCursor = lazy(() => import('./components/SwarmCursor'))
+const SplitText = lazy(() => import('./components/SplitText'))
+const AccordionGallery = lazy(() => import('./components/AccordionGallery'))
 
 const navItems = [
   ['work', 'Experience', 'work', 'experience'],
@@ -202,11 +205,27 @@ function SmoothLink({ to, onNavigate, className = '', children, ...rest }) {
 function App() {
   const [immersivePhase, setImmersivePhase] = useState(0)
   const [activeSection, setActiveSection] = useState('')
-  const [swarmEnabled, setSwarmEnabled] = useState(true)
+  const [swarmEnabled, setSwarmEnabled] = useState(false)
   const heroContentRef = useRef(null)
   const heroSectionRef = useRef(null)
   const experienceGridRef = useRef(null)
   const lenisRef = useRef(null)
+
+  // The lanyard badge is the heaviest hero resource (react-three-fiber, rapier,
+  // meshline and a ~1MB GLB that its module starts preloading the moment it
+  // loads). Holding off mounting it until window load keeps that download and
+  // chunk from ever competing with the critical initial render.
+  const [heroEffectsReady, setHeroEffectsReady] = useState(false)
+
+  useEffect(() => {
+    const arm = () => setHeroEffectsReady(true)
+    if (document.readyState === 'complete') {
+      arm()
+    } else {
+      window.addEventListener('load', arm, { once: true })
+    }
+    return () => window.removeEventListener('load', arm)
+  }, [])
 
   // Defer mounting the below-the-fold WebGL backgrounds until the user gets
   // close to them, so the initial page only pays for what it can see.
@@ -394,7 +413,9 @@ function App() {
   return (
       <div className="portfolio-page">
         <ScrollProgressBar />
-        {swarmEnabled && <SwarmCursor overlay color="#5de6ff" accentColor="#adc6ff" count={12} size={6} speed={2.5} spread={110} wander={0.25} trail={0.75} scatterOnClick /> }
+        <Suspense fallback={null}>
+          {swarmEnabled && <SwarmCursor overlay color="#5de6ff" accentColor="#adc6ff" count={12} size={6} speed={2.5} spread={110} wander={0.25} trail={0.75} scatterOnClick /> }
+        </Suspense>
 
       <Suspense fallback={null}>
         <FloatingCodeBackground />
@@ -449,15 +470,17 @@ function App() {
           <Suspense fallback={null}>
             <HeroMonogram />
           </Suspense>
-          <Suspense fallback={null}>
-            <Lanyard
-              className="hero-lanyard"
-              frontImage={myProfileImage}
-              backImage={cardLogoImage}
-              imageFit="cover"
-              onCardClick={scrollToContactFromLanyard}
-            />
-          </Suspense>
+          {heroEffectsReady && (
+            <Suspense fallback={null}>
+              <Lanyard
+                className="hero-lanyard"
+                frontImage={myProfileImage}
+                backImage={cardLogoImage}
+                imageFit="cover"
+                onCardClick={scrollToContactFromLanyard}
+              />
+            </Suspense>
+          )}
           <div ref={heroContentRef} className="reference-hero-content">
             <div className="hero-status">
               <i aria-hidden="true" />
@@ -692,57 +715,65 @@ function App() {
             </Suspense>
           )}
           <p className="section-label section-label--cyan">Expertise</p>
-          <div className="expertise-heading">
-            <SplitText
-              tag="h2"
-              id="expertise-heading"
-              text="AI products with a human centre."
-              className="expertise-heading-title"
-              textAlign="left"
-              delay={70}
-              duration={1.25}
-              ease="power3.out"
-              splitType="chars"
-              from={{ opacity: 0, y: 40 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="-100px"
-            />
-            <SplitText
-              text="From the first spark to a polished release, I create useful digital experiences with care and precision."
-              className="expertise-subheading"
-              textAlign="left"
-              delay={30}
-              duration={1}
-              ease="power3.out"
-              splitType="words"
-              from={{ opacity: 0, y: 30 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="-100px"
-            />
-          </div>
+          {mountExpertiseNetwork && (
+            <>
+              <Suspense fallback={null}>
+                <div className="expertise-heading">
+                  <SplitText
+                    tag="h2"
+                    id="expertise-heading"
+                    text="AI products with a human centre."
+                    className="expertise-heading-title"
+                    textAlign="left"
+                    delay={70}
+                    duration={1.25}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 40 }}
+                    to={{ opacity: 1, y: 0 }}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                  />
+                  <SplitText
+                    text="From the first spark to a polished release, I create useful digital experiences with care and precision."
+                    className="expertise-subheading"
+                    textAlign="left"
+                    delay={30}
+                    duration={1}
+                    ease="power3.out"
+                    splitType="words"
+                    from={{ opacity: 0, y: 30 }}
+                    to={{ opacity: 1, y: 0 }}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                  />
+                </div>
+              </Suspense>
 
-          <AccordionGallery
-            items={expertiseGalleryItems}
-            defaultIndex={0}
-            expandRatio={0.52}
-            trigger="hover"
-            accentColor="#5DE6FF"
-            overlayColor="#060010"
-            textColor="#ffffff"
-            grayscale
-            showLabels
-            duration={0.6}
-            ease="power3.out"
-            parallax={0.5}
-            tilt={8}
-            stagger={0.06}
-            height={460}
-            gap={10}
-            radius={16}
-            orientation="horizontal"
-          />
+              <Suspense fallback={null}>
+                <AccordionGallery
+                  items={expertiseGalleryItems}
+                  defaultIndex={0}
+                  expandRatio={0.52}
+                  trigger="hover"
+                  accentColor="#5DE6FF"
+                  overlayColor="#060010"
+                  textColor="#ffffff"
+                  grayscale
+                  showLabels
+                  duration={0.6}
+                  ease="power3.out"
+                  parallax={0.5}
+                  tilt={8}
+                  stagger={0.06}
+                  height={460}
+                  gap={10}
+                  radius={16}
+                  orientation="horizontal"
+                />
+              </Suspense>
+            </>
+          )}
 
           <span id="projects" aria-hidden="true" />
           <span className="workflow-anchor" id="workflow" aria-hidden="true" />
