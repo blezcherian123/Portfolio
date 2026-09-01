@@ -1254,6 +1254,17 @@ canvas#smokey-fluid-canvas {
   box-shadow: 0 0 8px #c7a9ff;
 }
 
+/* Dots are hardcoded neon pastels — deepen them so they read on light-mode pills. */
+[data-theme="light"] .pill-dot--cyan {
+  background: var(--secondary);
+  box-shadow: 0 0 8px var(--secondary-glow);
+}
+
+[data-theme="light"] .pill-dot--violet {
+  background: #7c3aed;
+  box-shadow: 0 0 8px rgba(124, 58, 237, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
@@ -3022,6 +3033,20 @@ html.lenis body {
 
 [data-theme="light"] .side-nav-item {
   color: rgba(58, 63, 86, 0.6);
+}
+
+/* Mobile bottom nav in light mode (hardcoded dark defaults otherwise) */
+[data-theme="light"] .mobile-bottom-nav {
+  background: var(--nav-bg);
+  border-top-color: rgba(26, 86, 219, 0.14);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .mobile-nav-item,
+[data-theme="light"] .mobile-nav-item:hover,
+[data-theme="light"] .mobile-nav-item:active,
+[data-theme="light"] .mobile-nav-item.is-active {
+  color: var(--secondary);
 }
 
 /* Footer in light mode */

@@ -539,6 +539,7 @@ function App() {
                 frontImage={myProfileImage}
                 backImage={cardLogoImage}
                 imageFit="cover"
+                hideOnMobile
                 onCardClick={scrollToContactFromLanyard}
               />
             </Suspense>

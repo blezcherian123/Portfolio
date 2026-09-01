@@ -31,3 +31,11 @@
   pointer-events: none;
   overflow: visible;
 }
+
+/* CSS-level safety net: even if `hideOnMobile` isn't set, the badge never
+   overlays or intercepts touches on small screens. */
+@media (max-width: 767px) {
+  .lanyard-root.hero-lanyard {
+    display: none;
+  }
+}

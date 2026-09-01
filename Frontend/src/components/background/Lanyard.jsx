@@ -41,6 +41,7 @@ export default function Lanyard({
   lanyardWidth = 1.0,
   onCardClick = null,
   className = '',
+  hideOnMobile = false,
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
   // The GLB is ~2.4MB, so the canvas only mounts after the page has finished
@@ -79,6 +80,10 @@ export default function Lanyard({
   const handleCardClick = () => {
     onCardClick?.()
   }
+
+  // Mobile doesn't need the badge card; returning early here also avoids
+  // mounting the ~2.4MB GLB and its WebGL context on small screens.
+  if (hideOnMobile && isMobile) return null
 
   return (
     <div className={`lanyard-root${className ? ` ${className}` : ''}`}>
