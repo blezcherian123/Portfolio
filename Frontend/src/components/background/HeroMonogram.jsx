@@ -21,7 +21,7 @@ export default function HeroMonogram() {
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !prefersReducedMotion })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion || isCompactViewport ? 1 : 1.4))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion || isCompactViewport ? 1 : 1.2))
     container.appendChild(renderer.domElement)
 
     const group = new THREE.Group()
@@ -41,19 +41,19 @@ export default function HeroMonogram() {
     body.position.x = -1.5
     group.add(body)
 
-    const topCurveGeometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100, Math.PI)
+    const topCurveGeometry = new THREE.TorusGeometry(1.5, 0.5, 12, 64, Math.PI)
     const topCurve = new THREE.Mesh(topCurveGeometry, material)
     topCurve.position.set(0, 1.5, 0)
     topCurve.rotation.z = -Math.PI / 2
     group.add(topCurve)
 
-    const bottomCurveGeometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100, Math.PI)
+    const bottomCurveGeometry = new THREE.TorusGeometry(1.5, 0.5, 12, 64, Math.PI)
     const bottomCurve = new THREE.Mesh(bottomCurveGeometry, material)
     bottomCurve.position.set(0, -1.5, 0)
     bottomCurve.rotation.z = -Math.PI / 2
     group.add(bottomCurve)
 
-    const particlesCount = prefersReducedMotion || isCompactViewport ? 120 : 200
+    const particlesCount = prefersReducedMotion || isCompactViewport ? 60 : 120
     const positions = new Float32Array(particlesCount * 3)
     for (let index = 0; index < particlesCount; index += 1) {
       positions[index * 3] = (Math.random() - 0.5) * 15

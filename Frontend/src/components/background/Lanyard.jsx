@@ -57,7 +57,7 @@ export default function Lanyard({
   useEffect(() => {
     let timer
     const arm = () => {
-      timer = window.setTimeout(() => setReady(true), 400)
+      timer = window.setTimeout(() => setReady(true), 800)
     }
     if (document.readyState === 'complete') {
       arm()
@@ -87,7 +87,7 @@ export default function Lanyard({
           <Suspense fallback={null}>
             <Canvas
               camera={{ position: position, fov: fov }}
-              dpr={[1, isMobile ? 1.5 : 2]}
+              dpr={[1, isMobile ? 1.25 : 1.5]}
               gl={{ alpha: transparent }}
               onCreated={(state) => {
                 state.gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)

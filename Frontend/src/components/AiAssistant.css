@@ -7,8 +7,8 @@
   z-index: 1000;
 }
 
-/* Floating assistant button — a round glass chip housing the Siri orb,
-   styled with the site's glass/cyan tokens. */
+/* Floating assistant button — the 3D chatbot head chip, layered with the
+   site's glass/cyan tokens and a characterful robot face. */
 .siri-fab {
   position: relative;
   width: 62px;
@@ -20,15 +20,15 @@
   cursor: pointer;
   color: #ffffff;
   background:
-    radial-gradient(circle at 50% 30%, rgba(23, 46, 84, 0.6), rgba(8, 16, 34, 0.92) 78%),
+    radial-gradient(circle at 50% 28%, rgba(23, 46, 84, 0.6), rgba(8, 16, 34, 0.96) 76%),
     var(--surface);
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.45),
+    0 14px 34px rgba(0, 0, 0, 0.5),
     0 0 0 4px var(--secondary-glow),
-    inset 0 1px 1px rgba(255, 255, 255, 0.12),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.4),
-    0 0 26px var(--secondary-glow);
-  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.3s ease, border-color 0.3s ease;
+    inset 0 1px 1px rgba(255, 255, 255, 0.14),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.45),
+    0 0 30px var(--secondary-glow);
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.3s ease, border-color 0.3s ease;
   animation: siriFabIn 0.6s cubic-bezier(0.16, 1, 0.3, 1.35) both;
 }
 
@@ -37,7 +37,7 @@
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* Expanding pulse ring, like the "listening" glow of the orb */
+/* Expanding signal ring, like a live connection pulse */
 .siri-fab::before {
   content: '';
   position: absolute;
@@ -55,14 +55,14 @@
 }
 
 .siri-fab:hover {
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-3px) scale(1.06);
   border-color: var(--secondary);
   box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.5),
+    0 20px 48px rgba(0, 0, 0, 0.55),
     0 0 0 4px var(--secondary-glow),
-    inset 0 1px 1px rgba(255, 255, 255, 0.16),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.4),
-    0 0 44px var(--secondary-glow);
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.45),
+    0 0 48px var(--secondary-glow);
 }
 
 .siri-fab:active {
@@ -82,176 +82,269 @@
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-/* Glassy Siri orb — a translucent, glowing sphere with light moving inside it,
-   clipped to the round button circle like the real Siri orb. */
-.siri-orb-ui {
+/* ─── 3D Chatbot face ─────────────────────────────────────── */
+
+/* Root: positions the head, antenna and bubble as one character group. */
+.bot-3d {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
+  display: block;
   pointer-events: none;
-  animation: siriGlassBreath 5s ease-in-out infinite;
 }
 
-/* Translucent glass base */
-.siri-orb-glass {
+/* Antenna sticking out the top of the head */
+.bot-antenna {
   position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 50% 40%,
-    rgba(205, 250, 255, 0.38),
-    rgba(70, 160, 230, 0.14) 40%,
-    rgba(16, 30, 62, 0.78) 82%
-  );
+  left: 50%;
+  top: -20px;
+  width: 3px;
+  height: 20px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, rgba(93, 230, 255, 0.9));
+  transform-origin: bottom center;
+  animation: botAntennaSway 3.4s ease-in-out infinite;
 }
 
-/* Slow-swirling colour field — Siri's internal luminance */
-.siri-orb-veins {
+@keyframes botAntennaSway {
+  0%, 100% { transform: translateX(-50%) rotate(-6deg); }
+  50% { transform: translateX(-50%) rotate(6deg); }
+}
+
+.bot-antenna-ball {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--secondary) 60%, #2e86c1);
+  box-shadow: 0 0 12px rgba(93, 230, 255, 0.9);
+  animation: botAntennaBlink 1.6s ease-in-out infinite;
+}
+
+@keyframes botAntennaBlink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px rgba(93, 230, 255, 0.9); }
+  50% { opacity: 0.55; box-shadow: 0 0 4px rgba(93, 230, 255, 0.4); }
+}
+
+/* Expanding signal ring emitted from the antenna */
+.bot-antenna-ring {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1px solid var(--secondary);
+  animation: botSignal 2.4s ease-out infinite;
+}
+
+@keyframes botSignal {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  80% { transform: translateX(-50%) scale(3.2); opacity: 0; }
+  100% { transform: translateX(-50%) scale(3.2); opacity: 0; }
+}
+
+/* The rounded head shell */
+.bot-head {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 210%;
-  height: 210%;
+  width: 46px;
+  height: 46px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(120, 232, 255, 0.9),
-    rgba(96, 140, 255, 0.65) 22%,
-    rgba(200, 140, 255, 0.45) 38%,
-    rgba(255, 190, 150, 0.34) 52%,
-    rgba(120, 232, 255, 0.85) 68%,
-    rgba(96, 140, 255, 0.55) 84%,
-    rgba(120, 232, 255, 0.9)
-  );
-  mix-blend-mode: screen;
-  filter: blur(14px);
-  opacity: 0.85;
-  animation: siriOrbSpin 16s linear infinite;
+  background: linear-gradient(150deg, #1b2b52 0%, #0d1730 40%, #16244d 100%);
+  box-shadow:
+    inset 0 -3px 10px rgba(0, 0, 0, 0.6),
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+  animation: botHeadBob 3.4s ease-in-out infinite;
 }
 
-/* Faster, finer inner turbulence */
-.siri-orb-turb {
+@keyframes botHeadBob {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-2px); }
+}
+
+/* The visor / glowing screen */
+.bot-visor {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 165%;
-  height: 165%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: conic-gradient(
-    from 180deg,
-    transparent 0deg,
-    rgba(195, 250, 255, 0.5) 40deg,
-    transparent 92deg,
-    transparent 180deg,
-    rgba(150, 190, 255, 0.4) 224deg,
-    transparent 286deg
-  );
-  mix-blend-mode: screen;
-  filter: blur(18px);
-  animation: siriOrbSpin 9s linear infinite reverse;
-}
-
-@keyframes siriOrbSpin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Wandering specks of light floating inside the sphere */
-.siri-orb-dot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  margin: -9px 0 0 -9px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(160, 240, 255, 0.4) 55%, transparent 78%);
-  filter: blur(1px);
-  animation: siriDotDrift 6.4s ease-in-out infinite;
-}
-
-.siri-orb-dot--2 {
-  width: 22px;
+  width: 30px;
   height: 22px;
-  margin: -11px 0 0 -11px;
-  opacity: 0.7;
-  animation-duration: 8.2s;
-  animation-delay: -1.8s;
-}
-
-.siri-orb-dot--3 {
-  width: 14px;
-  height: 14px;
-  margin: -7px 0 0 -7px;
-  opacity: 0.85;
-  animation-duration: 5.1s;
-  animation-delay: -3.2s;
-}
-
-@keyframes siriDotDrift {
-  0%, 100% { transform: translate(-12px, -6px); }
-  20% { transform: translate(4px, -16px); }
-  45% { transform: translate(14px, 4px); }
-  70% { transform: translate(-4px, 14px); }
-  90% { transform: translate(-14px, 4px); }
-}
-
-/* Bright inner core */
-.siri-orb-core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 40%;
-  height: 40%;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 16%, rgba(190, 250, 255, 0.5) 48%, transparent 78%);
-  filter: blur(1px);
-  animation: siriCorePulse 3s ease-in-out infinite;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(120, 240, 255, 0.95), rgba(46, 134, 193, 0.75) 60%, rgba(14, 34, 66, 0.9));
+  box-shadow:
+    inset 0 0 8px rgba(255, 255, 255, 0.35),
+    0 0 14px rgba(93, 230, 255, 0.6);
+  overflow: hidden;
 }
 
-@keyframes siriCorePulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
-  50% { transform: translate(-50%, -50%) scale(1.14); opacity: 1; }
-}
-
-/* Glass specular highlight */
-.siri-orb-highlight {
+/* Inner glass reflection on the visor */
+.bot-visor-glass {
   position: absolute;
-  left: 16%;
-  top: 12%;
-  width: 52%;
-  height: 30%;
+  left: 10%;
+  top: 6%;
+  width: 55%;
+  height: 40%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5), transparent 72%);
-  filter: blur(5px);
-  transform: rotate(-24deg);
-  animation: siriGlint 4.6s ease-in-out infinite;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6), transparent 70%);
+  filter: blur(1px);
+  opacity: 0.7;
+  animation: botVisorGlint 5s ease-in-out infinite;
 }
 
-@keyframes siriGlint {
-  0%, 100% { opacity: 0.75; }
+@keyframes botVisorGlint {
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
-/* Lens rim + inner shading for the glassy edge */
-.siri-orb-rim {
+/* Eyes */
+.bot-eye {
+  position: absolute;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #eafcff;
+  box-shadow: 0 0 8px rgba(93, 230, 255, 0.9);
+  display: grid;
+  place-items: center;
+  animation: botBlink 4s steps(1) infinite;
+}
+
+.bot-eye--left { left: 6px; }
+.bot-eye--right { right: 6px; }
+
+@keyframes botBlink {
+  0%, 46%, 54%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.12); }
+}
+
+.bot-iris {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #0a1628;
+  animation: botLook 5.2s ease-in-out infinite;
+}
+
+@keyframes botLook {
+  0%, 100% { transform: translateX(-1.5px); }
+  25% { transform: translateX(1.5px); }
+  50% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+/* Mouth — playful smile */
+.bot-mouth {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 10px;
+  height: 5px;
+  transform: translateX(-50%);
+  border: 1.5px solid #eafcff;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 0 6px rgba(93, 230, 255, 0.7);
+  animation: botSmileTalk 2.8s ease-in-out infinite;
+}
+
+@keyframes botSmileTalk {
+  0%, 100% { transform: translateX(-50%) scaleY(1); }
+  40% { transform: translateX(-50%) scaleY(0.7); }
+  70% { transform: translateX(-50%) scaleY(1.15); }
+}
+
+/* Soft ambient glow radiating inside the visor */
+.bot-face-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 40%, rgba(140, 240, 255, 0.35), transparent 70%);
+  opacity: 0.6;
+  animation: botFacePulse 3s ease-in-out infinite;
+}
+
+@keyframes botFacePulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+/* Cheek modules */
+.bot-cheek {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(93, 230, 255, 0.9), rgba(46, 134, 193, 0.5));
+  box-shadow: 0 0 8px rgba(93, 230, 255, 0.6);
+  animation: botCheekPulse 3.2s ease-in-out infinite;
+}
+
+.bot-cheek--left { left: 2px; }
+.bot-cheek--right { right: 2px; }
+
+@keyframes botCheekPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Specular highlight on the shell */
+.bot-shell-highlight {
+  position: absolute;
+  left: 14%;
+  top: 10%;
+  width: 45%;
+  height: 26%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45), transparent 72%);
+  filter: blur(1.5px);
+  transform: rotate(-24deg);
+}
+
+/* Rim shaping */
+.bot-shell-rim {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.28),
-    inset 0 -3px 8px rgba(8, 20, 44, 0.55),
-    inset 3px 0 10px rgba(93, 230, 255, 0.16),
-    0 0 14px rgba(93, 230, 255, 0.35);
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 -3px 8px rgba(8, 20, 44, 0.6),
+    inset 3px 0 10px rgba(93, 230, 255, 0.18);
 }
 
-/* Gentle breathing of the whole sphere */
-@keyframes siriGlassBreath {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.045); }
+/* Floating speech bubble */
+.bot-bubble {
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--liquid-fill-text);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(93, 230, 255, 0.45);
+  white-space: nowrap;
+  opacity: 0;
+  animation: botBubbleFloat 4s ease-in-out infinite;
+}
+
+@keyframes botBubbleFloat {
+  0%, 10% { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.85); }
+  18%, 32% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  40%, 100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.9); }
 }
 
 /* Siri waveform bars shared by the orb and the panel header */
@@ -636,8 +729,8 @@
     opacity: 1;
   }
 
-  .siri-orb-ui,
-  .siri-orb-ui * {
+  .bot-3d *,
+  .bot-3d {
     animation: none !important;
   }
 

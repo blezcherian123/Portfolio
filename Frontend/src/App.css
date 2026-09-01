@@ -105,6 +105,7 @@
   color: rgba(93, 230, 255, .2);
   font-family: monospace;
   white-space: nowrap;
+  will-change: transform;
   animation: float-upwards linear infinite;
 }
 
@@ -286,6 +287,31 @@ main,
   height: 100%;
   opacity: .67;
   pointer-events: none;
+}
+
+.fluid-sim,
+.hero-fluid-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+[data-theme="light"] .hero-fluid-canvas > canvas {
+  mix-blend-mode: normal;
+  opacity: 0.92;
+}
+
+/* Light-mode cursor fluid from react-smokey-fluid-cursor. The library injects
+   z-index: -9999 on its fixed canvas, which would bury it behind the opaque
+   page background. Specificity (canvas + id) beats that injected style. Content
+   layers use z-index >= 1, so the fluid stays between the background and text. */
+canvas#smokey-fluid-canvas {
+  z-index: 0;
+  opacity: 0.7;
 }
 
 .hero-three-canvas {
@@ -1999,6 +2025,30 @@ html.lenis body {
   height: auto;
 }
 
+/* ─── Performance: paint-skipping for below-fold sections ───── */
+.immersive-section,
+.tools-marquee-section,
+.reference-details,
+.reference-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
+/* Isolate each WebGL particle canvas so its repaints don't cascade */
+.particle-network {
+  contain: layout style paint;
+}
+
+/* GPU-composite animated layers only */
+.marquee-track {
+  will-change: transform;
+}
+
+/* Pause marquee when off-screen (toggled by JS) */
+.marquee-track.is-paused {
+  animation-play-state: paused !important;
+}
+
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
@@ -2902,6 +2952,23 @@ html.lenis body {
 [data-theme="light"] .reference-hero {
   background: radial-gradient(ellipse at 50% 48%, rgba(26, 86, 219, 0.08), transparent 67%),
               linear-gradient(to bottom, rgba(240, 244, 251, 0.6), transparent 50%);
+}
+
+/* In light mode the fluid trail replaces the monogram + name, and the hero
+   title becomes empty, so drop it entirely to avoid stray spacing. */
+[data-theme="light"] .hero-identity,
+[data-theme="light"] .reference-hero-content h1 {
+  display: none;
+}
+
+[data-theme="light"] .reference-hero-content .hero-status,
+[data-theme="light"] .reference-hero-content .hero-intro,
+[data-theme="light"] .reference-hero-content .hero-capabilities {
+  color: #12395c;
+}
+
+[data-theme="light"] .hero-fluid-canvas {
+  opacity: 0.9;
 }
 
 [data-theme="light"] .immersive-section {

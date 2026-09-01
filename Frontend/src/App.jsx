@@ -36,6 +36,11 @@ const SplitText = lazy(() => import('./components/SplitText'))
 const AccordionGallery = lazy(() => import('./components/AccordionGallery'))
 const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
+// Light mode swaps the particle network + monogram + animated name for a
+// fullscreen fluid cursor trail (react-smokey-fluid-cursor) that stays isolated
+// from the Three.js background bundle.
+const SmokeyCursor = lazy(() => import('./components/SmokeyCursor'))
+
 const navItems = [
   ['work', 'Experience', 'work', 'experience'],
   ['skills', 'Skills', 'code', 'skills'],
@@ -212,20 +217,48 @@ function App() {
   const experienceGridRef = useRef(null)
   const lenisRef = useRef(null)
 
-  // The lanyard badge is the heaviest hero resource (react-three-fiber, rapier,
-  // meshline and a ~1MB GLB that its module starts preloading the moment it
-  // loads). Holding off mounting it until window load keeps that download and
-  // chunk from ever competing with the critical initial render.
-  const [heroEffectsReady, setHeroEffectsReady] = useState(false)
+  // Track the active theme (dark default, light switches the hero to a WebGL
+  // fluid trail). Reacts to theme changes made by ThemeToggler via MutationObserver.
+  const [isLightMode, setIsLightMode] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return document.documentElement.getAttribute('data-theme') === 'light'
+  })
 
   useEffect(() => {
+    const apply = () => setIsLightMode(document.documentElement.getAttribute('data-theme') === 'light')
+    apply()
+    const observer = new MutationObserver(apply)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+
+  // Stagger heavy hero effects so they don't all initialise in the same
+  // frame. Each flag arms progressively later, spreading GPU/CPU work.
+  const [heroEffectsReady, setHeroEffectsReady] = useState(false)
+  const [heroMonogramReady, setHeroMonogramReady] = useState(false)
+  const [heroNetworkReady, setHeroNetworkReady] = useState(false)
+
+  useEffect(() => {
+    // 1) Particle network appears after a short paint delay
+    const netTimer = setTimeout(() => setHeroNetworkReady(true), 120)
+    // 2) Hero monogram follows shortly after
+    const monoTimer = setTimeout(() => setHeroMonogramReady(true), 280)
+    // 3) Lanyard (heaviest) waits until everything else has settled
     const arm = () => setHeroEffectsReady(true)
+    let loadHandler = null
+    let lanTimer = null
     if (document.readyState === 'complete') {
-      arm()
+      lanTimer = setTimeout(arm, 400)
     } else {
-      window.addEventListener('load', arm, { once: true })
+      loadHandler = () => { lanTimer = setTimeout(arm, 400) }
+      window.addEventListener('load', loadHandler, { once: true })
     }
-    return () => window.removeEventListener('load', arm)
+    return () => {
+      clearTimeout(netTimer)
+      clearTimeout(monoTimer)
+      clearTimeout(lanTimer)
+      if (loadHandler) window.removeEventListener('load', loadHandler)
+    }
   }, [])
 
   // Defer mounting the below-the-fold WebGL backgrounds until the user gets
@@ -411,6 +444,23 @@ function App() {
     return () => observer.disconnect()
   }, [])
 
+  // Pause CSS marquee animations when the skills section is off-screen so the
+  // browser never spends compositor time animating invisible elements.
+  useEffect(() => {
+    const section = document.getElementById('skills')
+    if (!section) return undefined
+    const tracks = section.querySelectorAll('.marquee-track')
+    if (!tracks.length) return undefined
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        tracks.forEach((t) => t.classList.toggle('is-paused', !entry.isIntersecting))
+      },
+      { rootMargin: '200px 0px' },
+    )
+    io.observe(section)
+    return () => io.disconnect()
+  }, [])
+
   return (
       <div className="portfolio-page">
         <ScrollProgressBar />
@@ -420,6 +470,10 @@ function App() {
 
       <Suspense fallback={null}>
         <FloatingCodeBackground />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        {isLightMode && <SmokeyCursor />}
       </Suspense>
 
       <div className="top-nav-bar">
@@ -461,19 +515,23 @@ function App() {
 
       <main>
         <section ref={heroSectionRef} className="reference-hero" id="home" aria-labelledby="hero-title">
-          <Suspense fallback={null}>
-            <ParticleNetworkBackground
-              className="hero-network-canvas"
-              pointsCount={180}
-              linkDistance={3.25}
-              color={0x2E86C1}
-              coverage={0.82}
-              showAmbientCloud={false}
-            />
-          </Suspense>
-          <Suspense fallback={null}>
-            <HeroMonogram />
-          </Suspense>
+          {!isLightMode && heroNetworkReady && (
+            <Suspense fallback={null}>
+              <ParticleNetworkBackground
+                className="hero-network-canvas"
+                pointsCount={180}
+                linkDistance={3.25}
+                color={0x2E86C1}
+                coverage={0.82}
+                showAmbientCloud={false}
+              />
+            </Suspense>
+          )}
+          {heroMonogramReady && (
+            <Suspense fallback={null}>
+              <HeroMonogram />
+            </Suspense>
+          )}
           {heroEffectsReady && (
             <Suspense fallback={null}>
               <Lanyard
@@ -494,8 +552,12 @@ function App() {
               </span>
             </div>
             <h1 id="hero-title">
-              <HeroName />
-              <span className="sr-only">Blesson C Biju</span>
+              {!isLightMode && (
+                <>
+                  <HeroName />
+                  <span className="sr-only">Blesson C Biju</span>
+                </>
+              )}
             </h1>
             {/* <p>Building Intelligent AI Products That Solve Real Problems.</p> */}
             <p className="hero-intro">From first idea to confident launch, I turn complex data and ambitious ideas into dependable, human-centred AI experiences that create measurable momentum.</p>

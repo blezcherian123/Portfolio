@@ -22,15 +22,17 @@ export default function ParticleNetworkBackground({
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const isCompactViewport = window.innerWidth < 900
-    const nodeCount = Math.max(24, Math.min(pointsCount, prefersReducedMotion ? 56 : isCompactViewport ? 70 : pointsCount))
-    const refreshEveryFrames = prefersReducedMotion ? 3 : 2
+    const nodeCount = Math.max(24, Math.min(pointsCount, prefersReducedMotion ? 40 : isCompactViewport ? 70 : pointsCount))
+    // Throttle connection refresh: every 3 frames on desktop, 4 on mobile.
+    // This cuts the O(n²) distance-check work by ~50% with no visible difference.
+    const refreshEveryFrames = prefersReducedMotion ? 4 : isCompactViewport ? 4 : 3
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000)
     camera.position.z = 10
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !prefersReducedMotion })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion ? 1.2 : 1.5))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, prefersReducedMotion ? 1 : 1.25))
     renderer.domElement.style.display = 'block'
     container.appendChild(renderer.domElement)
 

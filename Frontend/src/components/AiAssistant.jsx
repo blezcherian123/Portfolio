@@ -66,20 +66,45 @@ function SiriOrb({ className = '', active = false }) {
   )
 }
 
-// The signature Siri look: a glowing, translucent glass sphere with light
-// moving inside it — the orb that reads instantly as an AI assistant.
-function SiriBlobOrb() {
+// A friendly 3D-style chatbot head button: a layered robot face with glossy
+// glass visor, animated iris, flapping antenna, mouth, and a floating "Hi!"
+// speech bubble. Built purely from CSS with layered gradients, shadows, and
+// transform-based animation so it reads as a character, not a flat orb.
+function ChatbotFace() {
   return (
-    <span className="siri-orb-ui" aria-hidden="true">
-      <span className="siri-orb-glass" />
-      <span className="siri-orb-veins" />
-      <span className="siri-orb-turb" />
-      <span className="siri-orb-dot siri-orb-dot--1" />
-      <span className="siri-orb-dot siri-orb-dot--2" />
-      <span className="siri-orb-dot siri-orb-dot--3" />
-      <span className="siri-orb-core" />
-      <span className="siri-orb-highlight" />
-      <span className="siri-orb-rim" />
+    <span className="bot-3d" aria-hidden="true">
+      {/* Antenna + signal ring on top of the head */}
+      <span className="bot-antenna">
+        <span className="bot-antenna-ball" />
+        <span className="bot-antenna-ring" />
+      </span>
+
+      {/* The head shell */}
+      <span className="bot-head">
+        {/* Visor / screen with animated eyes + mouth */}
+        <span className="bot-visor">
+          <span className="bot-visor-glass" />
+          <span className="bot-eye bot-eye--left">
+            <span className="bot-iris" />
+          </span>
+          <span className="bot-eye bot-eye--right">
+            <span className="bot-iris" />
+          </span>
+          <span className="bot-mouth" />
+          <span className="bot-face-glow" />
+        </span>
+
+        {/* Cheek "modules" for the robot look */}
+        <span className="bot-cheek bot-cheek--left" />
+        <span className="bot-cheek bot-cheek--right" />
+
+        {/* Specular highlight + inner light on the shell */}
+        <span className="bot-shell-highlight" />
+        <span className="bot-shell-rim" />
+      </span>
+
+      {/* Floating speech bubble */}
+      <span className="bot-bubble">Hi!</span>
     </span>
   )
 }
@@ -205,7 +230,7 @@ export default function AiAssistant() {
         {open ? (
           <span className="material-symbols-outlined siri-fab-icon" aria-hidden="true">close</span>
         ) : (
-          <SiriBlobOrb />
+          <ChatbotFace />
         )}
       </button>
     </div>

@@ -14,21 +14,21 @@ export default function FloatingCodeBackground() {
     const container = containerRef.current
     if (!container) return undefined
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const snippetBudget = prefersReducedMotion ? 6 : 8
+    const snippetBudget = prefersReducedMotion ? 3 : 5
     const timeouts = []
     const createSnippet = () => {
       const snippet = document.createElement('span')
       snippet.className = 'floating-code'
       snippet.textContent = snippets[Math.floor(Math.random() * snippets.length)]
       snippet.style.left = `${Math.random() * 100}vw`
-      snippet.style.animationDuration = `${Math.random() * 10 + 15}s`
+      snippet.style.animationDuration = `${Math.random() * 8 + 18}s`
       snippet.style.fontSize = `${Math.random() * 4 + 8}px`
       container.appendChild(snippet)
-      const cleanup = window.setTimeout(() => snippet.remove(), 25000)
+      const cleanup = window.setTimeout(() => snippet.remove(), 28000)
       timeouts.push(cleanup)
     }
-    for (let index = 0; index < snippetBudget; index += 1) timeouts.push(window.setTimeout(createSnippet, Math.random() * 10000))
-    const interval = window.setInterval(createSnippet, 4500)
+    for (let index = 0; index < snippetBudget; index += 1) timeouts.push(window.setTimeout(createSnippet, Math.random() * 12000))
+    const interval = window.setInterval(createSnippet, 7000)
     return () => { window.clearInterval(interval); timeouts.forEach(window.clearTimeout) }
   }, [])
 

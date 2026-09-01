@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('/ogl/')) return 'ogl'
           if (id.includes('/three/') || id.includes('three/examples')) return 'three'
           if (id.includes('@react-three') || id.includes('meshline') || id.includes('rapier')) return 'three'
+          if (id.includes('react-smokey-fluid-cursor')) return 'smokey'
           return 'vendor'
         },
       },
