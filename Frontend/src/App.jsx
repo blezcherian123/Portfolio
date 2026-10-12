@@ -603,7 +603,7 @@ function App() {
             <div className="particle-illustration">
               <picture>
                 <source srcSet={portfolioPencilHolding} type="image/webp" />
-                <img src={portfolioPencilHoldingFallback} alt="Portfolio illustration featuring pencil with AI concept" loading="lazy" decoding="async" />
+                <img src={portfolioPencilHoldingFallback} alt="Portfolio illustration featuring pencil with AI concept" loading="lazy" decoding="async" fetchpriority="low" />
               </picture>
             </div>
           </div>
@@ -621,6 +621,7 @@ function App() {
                       src={myProfileImageFallback}
                       loading="lazy"
                       decoding="async"
+                      fetchpriority="low"
                     />
                   </picture>
                   <div className="profile-image-gradient-overlay" />

@@ -252,11 +252,11 @@ const AccordionGallery = ({
               <span className="ag-panel__media" ref={el => (mediaRefs.current[i] = el)}>
                 {item.video ? (
                   <video
-                    src={item.video}
+                    data-src={item.video}
                     muted
                     loop
                     playsInline
-                    preload="metadata"
+                    preload="none"
                     tabIndex={-1}
                     aria-hidden="true"
                   />
