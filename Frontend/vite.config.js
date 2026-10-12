@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ mode }) => ({
+// eslint-disable-next-line no-empty-pattern
+export default defineConfig(({ }) => ({
   base: '/',
   plugins: [react()],
   assetsInclude: ['**/*.glb'],
@@ -18,7 +19,9 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('gsap') || id.includes('@gsap')) return 'gsap'
           if (id.includes('ogl')) return 'ogl'
           if (id.includes('three')) return 'three'
-          if (id.includes('@react-three')) return 'r3f'
+          if (id.includes('@react-three/fiber')) return 'r3f'
+          if (id.includes('@react-three/drei')) return 'r3f-drei'
+          if (id.includes('@react-three/rapier')) return 'rapier'
           if (id.includes('meshline')) return 'meshline'
           if (id.includes('rapier')) return 'rapier'
           if (id.includes('react-smokey-fluid-cursor')) return 'smokey'
